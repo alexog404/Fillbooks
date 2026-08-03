@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body { margin:0; }
+  *::selection { background: rgba(139,92,246,0.35); }
+  ::-webkit-scrollbar { width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb { background:#3a4155; border-radius:5px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  a { color:#8b5cf6; text-decoration:none; }
+  a:hover { color:#a992f7; text-decoration:underline; }
+  input, textarea, select, button { font-family: inherit; }
+</style>
+</helmet>
+
+<div style="display:flex;min-height:100vh;background:{{c.bg}};color:{{c.textPrimary}};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+
+  <div style="width:216px;flex:none;display:flex;flex-direction:column;background:{{c.surface}};border-right:1px solid {{c.border}};position:sticky;top:0;height:100vh;">
+    <div style="display:flex;align-items:center;gap:9px;padding:20px 18px 16px;">
+      <div style="width:26px;height:26px;border-radius:6px;background:{{c.accent}};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;">L</div>
+      <div style="font-weight:700;font-size:15px;letter-spacing:0.3px;">LEDGERLINE</div>
+    </div>
+
+    <div style="padding:0 12px;display:flex;flex-direction:column;gap:2px;margin-top:6px;">
+      <sc-for list="{{navItems}}" as="item" hint-placeholder-count="6">
+        <div onClick="{{item.onClick}}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;" style-hover="background:{{c.surfaceHover}};">
+          <div style="width:16px;height:16px;flex:none;opacity:0.9;">{{item.icon}}</div>
+          <div>{{item.label}}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top:18px;padding:0 22px 8px;font-size:10px;letter-spacing:0.08em;color:{{c.textMuted}};text-transform:uppercase;">Deliverables</div>
+    <div style="padding:0 12px;display:flex;flex-direction:column;gap:2px;">
+      <sc-for list="{{deliverableItems}}" as="item" hint-placeholder-count="2">
+        <div onClick="{{item.onClick}}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;" style-hover="background:{{c.surfaceHover}};">
+          <div style="width:16px;height:16px;flex:none;opacity:0.9;">{{item.icon}}</div>
+          <div>{{item.label}}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top:auto;padding:16px;border-top:1px solid {{c.border}};">
+      <div style="font-size:11px;color:{{c.textMuted}};margin-bottom:8px;">Theme</div>
+      <div style="display:flex;background:{{c.surface2}};border:1px solid {{c.border}};border-radius:8px;padding:3px;">
+        <div onClick="{{setThemeDark}}" style="flex:1;text-align:center;padding:6px 0;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:{{darkPillBg}};color:{{darkPillColor}};">Dark</div>
+        <div onClick="{{setThemeLight}}" style="flex:1;text-align:center;padding:6px 0;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:{{lightPillBg}};color:{{lightPillColor}};">Light</div>
+      </div>
+      <div style="font-size:10.5px;color:{{c.textMuted}};margin-top:10px;">Personal Equities Day-Trading Journal — static mockup</div>
+    </div>
+  </div>
+
+  <div style="flex:1;min-width:0;">
+
+    <sc-if value="{{notLoaded}}" hint-placeholder-val="{{true}}">
+      <div style="padding:28px;display:flex;flex-direction:column;gap:16px;">
+        <div style="height:22px;width:180px;border-radius:5px;background:{{c.surfaceHover}};"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;">
+          <sc-for list="{{skeletonKpis}}" as="s" hint-placeholder-count="6">
+            <div style="height:84px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};"></div>
+          </sc-for>
+        </div>
+        <div style="height:320px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};"></div>
+        <div style="height:220px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};"></div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{loaded}}" hint-placeholder-val="{{false}}">
+
+      <!-- ===================== DASHBOARD ===================== -->
+      <sc-if value="{{isDashboard}}" hint-placeholder-val="{{false}}">
+        <div data-screen-label="Dashboard" style="padding:24px 28px 40px;">
+          <div style="margin-bottom: 18px; display: flex; align-items: stretch; gap: 16px; position: relative">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative">
+              <div style="font-size:19px;font-weight:700;">Dashboard</div>
+              <div style="font-size:12.5px;color:{{c.textMuted}};margin-top:2px;margin-bottom:12px;">Warrior-style momentum log · July 2026</div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:auto;">
+                <div style="position:relative;">
+                  <div onClick="{{toggleDashPicker}}" style="font-size:12px;padding:7px 12px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};color:{{c.textSecondary}};cursor:pointer;display:flex;align-items:center;gap:6px;">📅 {{dashWeekLabel}} ▾</div>
+                  <sc-if value="{{showDashPicker}}" hint-placeholder-val="{{false}}">
+                    <div style="position:absolute;left:0;top:36px;z-index:10;background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);width:230px;">
+                      <div style="font-size:9.5px;color:{{c.textMuted}};margin-bottom:6px;">Click a day, then another to set a range</div>
+                      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                        <div onClick="{{dashPrevMonth}}" style="width:22px;height:22px;border-radius:5px;background:{{c.surface2}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;">‹</div>
+                        <div style="font-size:11.5px;font-weight:700;">{{dashPickerMonthLabel}}</div>
+                        <div onClick="{{dashNextMonth}}" style="width:22px;height:22px;border-radius:5px;background:{{c.surface2}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;">›</div>
+                      </div>
+                      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:9px;color:{{c.textMuted}};margin-bottom:3px;">
+                        <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                      </div>
+                      <sc-for list="{{dashPickerWeeks}}" as="week" hint-placeholder-count="5">
+                        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">
+                          <sc-for list="{{week}}" as="cell" hint-placeholder-count="7">
+                            <div onClick="{{cell.onClick}}" onMouseEnter="{{cell.onHover}}" style="aspect-ratio:1;border-radius:5px;background:{{cell.bg}};display:flex;align-items:center;justify-content:center;font-size:9.5px;color:#fff;cursor:{{cell.cursor}};border:{{cell.ring}};box-sizing:border-box;">{{cell.dayNum}}</div>
+                          </sc-for>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+                <div style="font-size:12px;padding:7px 12px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};color:{{c.textSecondary}};cursor:pointer;">Margin · IBKR</div>
+                <div style="display:flex;gap:6px;">
+                  <sc-for list="{{stateToggles.dashboard}}" as="opt" hint-placeholder-count="3">
+                    <div onClick="{{opt.onClick}}" style="font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer;background:{{opt.bg}};color:{{opt.color}};border:1px solid {{c.border}};">{{opt.label}}</div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div onMouseMove="{{onAcctMouseMove}}" onMouseLeave="{{onAcctMouseLeave}}" style="flex: none; width: 350px; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; background: {{c.bg}}; height: 85px">
+              <svg width="100%" height="100%" viewBox="0 0 {{acctSparkW}} {{acctSparkH}}" preserveAspectRatio="none" style="position:absolute;inset:0;">
+                <defs>
+                  <linearGradient id="acctSparkGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="{{c.win}}" stop-opacity="0.85"></stop>
+                    <stop offset="100%" stop-color="{{c.win}}" stop-opacity="0"></stop>
+                  </linearGradient>
+                </defs>
+                <polyline points="{{acctSparkArea}}" fill="url(#acctSparkGrad)" stroke="none"></polyline>
+                <polyline points="{{acctSparkPoints}}" fill="none" stroke="{{c.win}}" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" stroke-opacity="0.9"></polyline>
+                <sc-if value="{{acctHovering}}" hint-placeholder-val="{{false}}">
+                  <line x1="0" y1="0" x2="0" y2="{{acctSparkH}}" stroke="{{c.textMuted}}" stroke-width="0.25" stroke-dasharray="1.5,1.5" style="transform:translateX({{acctHoverX}}px);transition:transform 0.09s linear;"></line>
+                  <circle cx="{{acctHoverX}}" cy="{{acctHoverY}}" r="1" fill="{{c.win}}" stroke="{{c.bg}}" stroke-width="0.5" style="transition:cx 0.09s linear,cy 0.09s linear;"></circle>
+                </sc-if>
+              </svg>
+              <div style="position:relative;">
+                <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.04em;">Account Balance</div>
+                <div style="font-size:30px;font-weight:800;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;margin-top:4px;">{{acctDisplayText}}</div>
+                <div style="font-size:14px;font-weight:700;font-family:ui-monospace,monospace;color:{{acctDisplaySubColor}};margin-top:2px;">{{acctDisplaySub}}</div>
+              </div>
+            </div>
+          </div>
+
+          <sc-if value="{{dashLoading}}" hint-placeholder-val="{{false}}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;">
+              <sc-for list="{{skeletonKpis}}" as="s" hint-placeholder-count="6">
+                <div style="height:84px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};position:relative;overflow:hidden;">
+                  <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,{{c.surfaceHover}},transparent);animation:none;"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="height:340px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};margin-bottom:16px;"></div>
+            <div style="height:220px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};"></div>
+          </sc-if>
+
+          <sc-if value="{{dashEmpty}}" hint-placeholder-val="{{false}}">
+            <div style="border:1px dashed {{c.borderStrong}};border-radius:12px;padding:64px 24px;text-align:center;color:{{c.textMuted}};">
+              <div style="font-size:30px;margin-bottom:10px;">◇</div>
+              <div style="font-size:14px;font-weight:600;color:{{c.textSecondary}};margin-bottom:4px;">No trades logged yet</div>
+              <div style="font-size:12.5px;max-width:340px;margin:0 auto;">Import your fills or add a trade manually to start seeing your KPIs, calendar and equity curve here.</div>
+              <div style="margin-top:16px;display:inline-block;padding:8px 16px;border-radius:7px;background:{{c.accent}};color:#fff;font-size:12.5px;font-weight:600;cursor:pointer;">+ Add Trade</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{dashData}}" hint-placeholder-val="{{true}}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;">
+              <sc-for list="{{kpiCards}}" as="k" hint-placeholder-count="5">
+                <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:14px 16px;box-shadow:{{c.cardShadow}};display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <div>
+                    <div style="font-size:11px;color:{{c.textMuted}};margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">{{k.label}}</div>
+                    <div style="font-size:21px;font-weight:700;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;color:{{k.color}};">{{k.value}}</div>
+                    <sc-if value="{{k.sub}}" hint-placeholder-val="{{false}}"><div style="font-size:11px;color:{{c.textMuted}};margin-top:4px;">{{k.sub}}</div></sc-if>
+                    <sc-if value="{{k.winPct}}" hint-placeholder-val="{{false}}">
+                      <div style="width:110px;height:8px;border-radius:4px;overflow:hidden;display:flex;margin-top:8px;">
+                        <div style="height:100%;width:{{k.winPct}};background:{{c.win}};"></div>
+                        <div style="height:100%;width:{{k.lossPct}};background:{{c.loss}};"></div>
+                      </div>
+                      <div style="display:flex;justify-content:space-between;width:110px;font-size:10px;font-family:ui-monospace,monospace;margin-top:3px;">
+                        <span style="color:{{c.win}};">{{k.avgWinText}}</span><span style="color:{{c.loss}};">{{k.avgLossText}}</span>
+                      </div>
+                    </sc-if>
+                  </div>
+                  <sc-if value="{{k.sparkPoints}}" hint-placeholder-val="{{false}}">
+                    <svg width="90" height="34" viewBox="0 0 {{k.sparkW}} {{k.sparkH}}" style="flex:none;">
+                      <defs>
+                        <linearGradient id="sparkGrad-{{$index}}" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stop-color="{{k.sparkColor}}" stop-opacity="0.6"></stop>
+                          <stop offset="100%" stop-color="{{k.sparkColor}}" stop-opacity="0"></stop>
+                        </linearGradient>
+                      </defs>
+                      <polyline points="{{k.sparkArea}}" fill="url(#sparkGrad-{{$index}})" stroke="none"></polyline>
+                      <polyline points="{{k.sparkPoints}}" fill="none" stroke="{{k.sparkColor}}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+                    </svg>
+                  </sc-if>
+                  <sc-if value="{{k.ringDash}}" hint-placeholder-val="{{false}}">
+                    <svg width="52" height="52" viewBox="0 0 52 52" style="flex:none;">
+                      <circle cx="26" cy="26" r="24" fill="none" stroke="{{c.loss}}" stroke-width="5"></circle>
+                      <circle cx="26" cy="26" r="24" fill="none" stroke="{{c.win}}" stroke-width="5" stroke-dasharray="{{k.ringDash}}" stroke-dashoffset="{{k.ringOffset}}" transform="rotate(-90 26 26)" stroke-linecap="round"></circle>
+                    </svg>
+                  </sc-if>
+                  <sc-if value="{{k.gaugeSegments}}" hint-placeholder-val="{{false}}">
+                    <div style="flex:none;text-align:center;">
+                      <svg width="72" height="42" viewBox="0 0 120 65" style="overflow:visible;">
+                        <sc-for list="{{k.gaugeSegments}}" as="seg" hint-placeholder-count="3">
+                          <path d="{{seg.path}}" fill="none" stroke-width="9" stroke-linecap="round" stroke="{{seg.color}}"></path>
+                        </sc-for>
+                      </svg>
+                      <div style="display:flex;gap:4px;justify-content:center;margin-top:2px;">
+                        <sc-for list="{{k.gaugeCounts}}" as="ct" hint-placeholder-count="3">
+                          <span style="font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:8px;background:{{ct.color}}22;color:{{ct.color}};">{{ct.n}}</span>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.75fr 1fr;gap:16px;margin-bottom:16px;">
+              <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:16px 18px;box-shadow:{{c.cardShadow}};min-width:0;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div onClick="{{dashCalPrevMonth}}" style="width:22px;height:22px;border-radius:5px;background:{{c.surface2}};border:1px solid {{c.border}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;">‹</div>
+                    <div style="font-size:13px;font-weight:700;">{{dashCalMonthLabel}}</div>
+                    <div onClick="{{dashCalNextMonth}}" style="width:22px;height:22px;border-radius:5px;background:{{c.surface2}};border:1px solid {{c.border}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;">›</div>
+                    <div style="font-size:12px;font-weight:700;font-family:ui-monospace,monospace;color:{{dashCalMonthPctColor}};margin-left:4px;">{{dashCalMonthPctText}}</div>
+                  </div>
+                  <div style="font-size:11px;color:{{c.textMuted}};">Click a day with trades for detail</div>
+                </div>
+                <div style="position:relative;">
+                  <div style="position:absolute;right:-1px;top:-3px;bottom:-3px;width:calc((100% - 42px)/8 + 2px);border:1.5px solid {{c.accent}};border-radius:8px;background:{{c.accentSoft}};pointer-events:none;z-index:0;"></div>
+                  <div style="position:relative;z-index:1;display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:4px;font-size:9px;color:{{c.textMuted}};">
+                    <div style="min-width:0;">Sun</div><div style="min-width:0;">Mon</div><div style="min-width:0;">Tue</div><div style="min-width:0;">Wed</div><div style="min-width:0;">Thu</div><div style="min-width:0;">Fri</div><div style="min-width:0;">Sat</div>
+                    <div style="min-width:0;color:{{c.accent}};font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;">Weeks</div>
+                  </div>
+                  <sc-for list="{{calendarWeeks}}" as="week" hint-placeholder-count="5">
+                    <div style="position:relative;z-index:1;display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:6px;">
+                      <sc-for list="{{week.cells}}" as="cell" hint-placeholder-count="7">
+                        <div onClick="{{cell.onClick}}" style="height:64px;min-width:0;box-sizing:border-box;border-radius:6px;padding:4px;background:{{cell.bg}};border:1px solid {{cell.border}};cursor:{{cell.cursor}};overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;" style-hover="{{cell.hoverStyle}}">
+                          <div style="font-size:9.5px;color:{{c.textMuted}};white-space:nowrap;">{{cell.dayNum}}</div>
+                          <div style="font-size:10px;font-weight:700;font-family:ui-monospace,monospace;color:{{cell.pnlColor}};margin-top:3px;white-space:nowrap;">{{cell.pnlText}}</div>
+                          <div style="font-size:8px;color:{{c.textMuted}};margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{cell.metaText}}</div>
+                        </div>
+                      </sc-for>
+                      <div style="height:64px;min-width:0;box-sizing:border-box;border-radius:6px;background:{{c.surface2}};border:1px solid {{c.border}};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;text-align:center;overflow:hidden;">
+                        <div style="font-size:10px;font-weight:700;font-family:ui-monospace,monospace;color:{{week.totalColor}};white-space:nowrap;">{{week.totalText}}</div>
+                        <div style="font-size:7.5px;color:{{c.textMuted}};margin-top:2px;white-space:nowrap;">{{week.weekLabel}}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <div style="overflow:hidden;transition:max-height 0.28s ease,opacity 0.22s ease,margin-top 0.28s ease;max-height:{{dayViewMaxHeight}};opacity:{{dayViewOpacity}};margin-top:{{dayViewMarginTop}};">
+                  <div style="border-top:1px solid {{c.border}};padding-top:12px;">
+                    <div style="font-size:12.5px;font-weight:700;margin-bottom:8px;">{{dayViewLabel}}</div>
+                    <sc-for list="{{dayViewTrades}}" as="t" hint-placeholder-count="2">
+                      <div onClick="{{t.onClick}}" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:7px;margin-bottom:4px;cursor:pointer;background:{{c.surface2}};" style-hover="background:{{c.surfaceHover}};">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                          <div style="font-size:12px;font-weight:700;font-family:ui-monospace,monospace;">{{t.symbol}}</div>
+                          <div style="font-size:10.5px;color:{{c.textMuted}};">{{t.time}}</div>
+                        </div>
+                        <div style="font-size:12px;font-weight:700;font-family:ui-monospace,monospace;color:{{t.pnlColor}};">{{t.pnlText}}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;box-shadow:{{c.cardShadow}};min-width:0;">
+                <div style="padding:14px 18px;border-bottom:1px solid {{c.border}};font-size:13px;font-weight:700;">Recent Trades</div>
+                <div style="display:grid;grid-template-columns:20fr 42fr 18fr 43fr 24fr 53fr;gap:4px;padding:8px 9px;font-size:9px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.02em;">
+                  <div>Date</div><div>Sym</div><div style="text-align:right;">Qty</div><div style="text-align:right;">P&amp;L</div><div style="text-align:right;">R</div><div>Status</div>
+                </div>
+                <sc-for list="{{recentTrades}}" as="t" hint-placeholder-count="6">
+                  <div onClick="{{t.onClick}}" style="display:grid;grid-template-columns:20fr 42fr 18fr 43fr 24fr 53fr;gap:4px;padding:8px 9px;font-size:10.5px;cursor:pointer;border-top:1px solid {{c.border}};align-items:center;" style-hover="background:{{c.surfaceHover}};">
+                    <div style="color:{{c.textSecondary}};font-size:8.5px;">{{t.dateShort}}</div>
+                    <div style="font-weight:700;font-family:ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;">{{t.symbol}}</div>
+                    <div style="text-align:right;font-family:ui-monospace,monospace;font-size:9px;color:{{c.textSecondary}};white-space:nowrap;">{{t.qty}}</div>
+                    <div style="text-align:right;font-weight:700;font-family:ui-monospace,monospace;font-size:9.5px;color:{{t.pnlColor}};white-space:nowrap;">{{t.pnlText}}</div>
+                    <div style="text-align:right;font-family:ui-monospace,monospace;font-size:9px;color:{{t.rColor}};white-space:nowrap;">{{t.rText}}</div>
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;min-width:0;overflow:hidden;">
+                      <span style="width:6px;height:6px;border-radius:50%;background:{{t.statusDotColor}};flex:none;"></span>
+                      <span style="font-size:8px;font-family:-apple-system,'system-ui','Segoe UI',Helvetica,Arial,sans-serif;font-weight:500;color:{{c.textMuted}};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{t.statusText}}</span>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:16px 18px;box-shadow:{{c.cardShadow}};">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="font-size:13px;font-weight:700;">Daily P&amp;L — Win vs Loss Days</div>
+                <div style="font-size:12px;font-weight:700;font-family:ui-monospace,monospace;color:{{equityEndColor}};">{{equityEndText}}</div>
+              </div>
+              <div style="display:flex;">
+                <div style="display:flex;flex-direction:column;justify-content:space-between;height:210px;padding-right:8px;font-size:10px;color:{{c.textMuted}};font-family:ui-monospace,monospace;text-align:right;">
+                  <sc-for list="{{eqTicks}}" as="tk" hint-placeholder-count="5">
+                    <div>{{tk.label}}</div>
+                  </sc-for>
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <svg width="100%" height="210" viewBox="0 0 560 210" preserveAspectRatio="none">
+                    <sc-for list="{{eqTicks}}" as="tk" hint-placeholder-count="5">
+                      <line x1="0" y1="{{tk.y}}" x2="560" y2="{{tk.y}}" stroke="{{c.chartGrid}}" stroke-width="1" stroke-dasharray="3,4"></line>
+                    </sc-for>
+                    <line x1="0" y1="{{baseY}}" x2="560" y2="{{baseY}}" stroke="{{c.border}}" stroke-width="1"></line>
+                    <sc-for list="{{dayBars}}" as="bar" hint-placeholder-count="12">
+                      <rect x="{{bar.x}}" y="{{bar.y}}" width="{{bar.w}}" height="{{bar.h}}" fill="{{bar.color}}" rx="2"></rect>
+                    </sc-for>
+                  </svg>
+                  <div style="position:relative;height:16px;">
+                    <sc-for list="{{eqXLabels}}" as="xl" hint-placeholder-count="4">
+                      <div style="position:absolute;left:{{xl.x}};top:0;font-size:10px;color:{{c.textMuted}};transform:translateX(-50%);white-space:nowrap;">{{xl.label}}</div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ===================== TRADES LIST ===================== -->
+      <sc-if value="{{isTrades}}" hint-placeholder-val="{{false}}">
+        <div data-screen-label="Trades" style="padding:24px 28px 40px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:19px;font-weight:700;">Trades</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="position:relative;">
+                <div onClick="{{toggleTradesPicker}}" style="font-size:12px;padding:7px 12px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};color:{{c.textSecondary}};cursor:pointer;display:flex;align-items:center;gap:6px;">📅 {{tradesRangeLabel}} ▾</div>
+                <sc-if value="{{showTradesPicker}}" hint-placeholder-val="{{false}}">
+                  <div style="position:absolute;right:0;top:36px;z-index:10;background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);width:230px;">
+                    <div style="font-size:9.5px;color:{{c.textMuted}};margin-bottom:6px;">Click a day, then another to set a range</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                      <div onClick="{{tradesPrevMonth}}" style="width:22px;height:22px;border-radius:5px;background:{{c.surface2}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;">‹</div>
+                      <div style="font-size:11.5px;font-weight:700;">{{tradesPickerMonthLabel}}</div>
+                      <div onClick="{{tradesNextMonth}}" style="width:22px;height:22px;border-radius:5px;background:{{c.surface2}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;">›</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:9px;color:{{c.textMuted}};margin-bottom:3px;">
+                      <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                    </div>
+                    <sc-for list="{{tradesPickerWeeks}}" as="week" hint-placeholder-count="5">
+                      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">
+                        <sc-for list="{{week}}" as="cell" hint-placeholder-count="7">
+                          <div onClick="{{cell.onClick}}" onMouseEnter="{{cell.onHover}}" style="aspect-ratio:1;border-radius:5px;background:{{cell.bg}};display:flex;align-items:center;justify-content:center;font-size:9.5px;color:#fff;cursor:{{cell.cursor}};border:{{cell.ring}};box-sizing:border-box;">{{cell.dayNum}}</div>
+                        </sc-for>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <sc-for list="{{stateToggles.trades}}" as="opt" hint-placeholder-count="3">
+                  <div onClick="{{opt.onClick}}" style="font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer;background:{{opt.bg}};color:{{opt.color}};border:1px solid {{c.border}};">{{opt.label}}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <sc-if value="{{tradesLoading}}" hint-placeholder-val="{{false}}">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <sc-for list="{{skeletonRows}}" as="r" hint-placeholder-count="10">
+                <div style="height:34px;border-radius:6px;background:{{c.surface}};border:1px solid {{c.border}};"></div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{tradesEmpty}}" hint-placeholder-val="{{false}}">
+            <div style="border:1px dashed {{c.borderStrong}};border-radius:12px;padding:60px 24px;text-align:center;color:{{c.textMuted}};">
+              <div style="font-size:28px;margin-bottom:10px;">▤</div>
+              <div style="font-size:14px;font-weight:600;color:{{c.textSecondary}};">No trades match these filters</div>
+              <div style="font-size:12.5px;margin-top:4px;">Try widening the date range.</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{tradesData}}" hint-placeholder-val="{{true}}">
+            <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;overflow-x:auto;overflow-y:hidden;box-shadow:{{c.cardShadow}};">
+              <div style="min-width:980px;">
+              <div style="display:grid;grid-template-columns:96px 96px 64px 42px 56px 1fr 56px 90px 56px 120px 66px 60px 30px;gap:8px;padding:9px 16px;font-size:10.2px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.03em;background:{{c.surface2}};">
+                <div onClick="{{sortByDate}}" style="cursor:pointer;">Date{{dateSortArrow}}</div>
+                <div>Time</div><div>Sym</div><div>Side</div><div style="text-align:right;">Qty</div>
+                <div style="text-align:right;">Entry</div><div style="text-align:right;">Exit</div>
+                <div onClick="{{sortByPnl}}" style="text-align:right;cursor:pointer;">Net P&amp;L{{pnlSortArrow}}</div>
+                <div style="text-align:right;">R</div><div>Duration</div><div>Status</div><div>Note</div><div></div>
+              </div>
+              <sc-if value="{{hasTradesGroups}}" hint-placeholder-val="{{false}}">
+                <sc-for list="{{tradesGroups}}" as="g" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:{{c.surface2}};border-top:1px solid {{c.border}};">
+                    <div style="font-size:11.5px;font-weight:700;color:{{c.textSecondary}};">{{g.label}}</div>
+                    <div style="font-size:11.5px;font-weight:700;font-family:ui-monospace,monospace;color:{{g.totalColor}};">{{g.totalText}}</div>
+                  </div>
+                  <sc-for list="{{g.rows}}" as="t" hint-placeholder-count="3">
+                    <div onClick="{{t.onClick}}" style="display:grid;grid-template-columns:96px 96px 64px 42px 56px 1fr 56px 90px 56px 120px 66px 60px 30px;gap:8px;padding:8px 16px;font-size:12px;cursor:pointer;border-top:1px solid {{c.border}};align-items:center;background:{{t.rowBg}};" style-hover="background:{{c.surfaceHover}};">
+                      <div style="color:{{c.textSecondary}};">{{t.dateShort}}</div>
+                      <div style="color:{{c.textMuted}};font-family:ui-monospace,monospace;">{{t.time}}</div>
+                      <div style="font-weight:700;font-family:ui-monospace,monospace;">{{t.symbol}}</div>
+                      <div style="color:{{t.sideColor}};font-weight:600;font-size:10.5px;">{{t.sideLabel}}</div>
+                      <div style="text-align:right;font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{t.qty}}</div>
+                      <div style="text-align:right;font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{t.entryText}}</div>
+                      <div style="text-align:right;font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{t.exitText}}</div>
+                      <div style="text-align:right;font-weight:700;font-family:ui-monospace,monospace;color:{{t.pnlColor}};">{{t.pnlText}}</div>
+                      <div style="text-align:right;font-family:ui-monospace,monospace;color:{{t.rColor}};">{{t.rText}}</div>
+                      <div style="color:{{c.textMuted}};font-family:ui-monospace,monospace;">{{t.duration}}</div>
+                      <div><span style="font-size:11px;color:{{c.textSecondary}};display:inline-flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;border-radius:50%;background:{{t.statusDotColor}};flex:none;"></span>{{t.status}}</span></div>
+                      <div style="color:{{t.noteColor}};">{{t.noteDot}}</div>
+                      <div style="color:{{c.textMuted}};">›</div>
+                    </div>
+                  </sc-for>
+                </sc-for>
+              </sc-if>
+              <sc-if value="{{noTradesGroups}}" hint-placeholder-val="{{true}}">
+              <sc-for list="{{tradesRows}}" as="t" hint-placeholder-count="14">
+                <div onClick="{{t.onClick}}" style="display:grid;grid-template-columns:96px 96px 64px 42px 56px 1fr 56px 90px 56px 120px 66px 60px 30px;gap:8px;padding:8px 16px;font-size:12px;cursor:pointer;border-top:1px solid {{c.border}};align-items:center;background:{{t.rowBg}};" style-hover="background:{{c.surfaceHover}};">
+                  <div style="color:{{c.textSecondary}};">{{t.dateShort}}</div>
+                  <div style="color:{{c.textMuted}};font-family:ui-monospace,monospace;">{{t.time}}</div>
+                  <div style="font-weight:700;font-family:ui-monospace,monospace;">{{t.symbol}}</div>
+                  <div style="color:{{t.sideColor}};font-weight:600;font-size:10.5px;">{{t.sideLabel}}</div>
+                  <div style="text-align:right;font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{t.qty}}</div>
+                  <div style="text-align:right;font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{t.entryText}}</div>
+                  <div style="text-align:right;font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{t.exitText}}</div>
+                  <div style="text-align:right;font-weight:700;font-family:ui-monospace,monospace;color:{{t.pnlColor}};">{{t.pnlText}}</div>
+                  <div style="text-align:right;font-family:ui-monospace,monospace;color:{{t.rColor}};">{{t.rText}}</div>
+                  <div style="color:{{c.textMuted}};font-family:ui-monospace,monospace;">{{t.duration}}</div>
+                  <div><span style="font-size:10px;padding:2px 7px;border-radius:10px;background:{{c.surface2}};color:{{c.textSecondary}};border:1px solid {{c.border}};display:inline-flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;border-radius:50%;background:{{t.statusDotColor}};flex:none;"></span>{{t.status}}</span></div>
+                  <div style="font-size:13px;color:{{t.noteColor}};text-align:center;">{{t.noteDot}}</div>
+                  <div></div>
+                </div>
+              </sc-for>
+              </sc-if>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ===================== TRADE DETAIL ===================== -->
+      <sc-if value="{{isTradeDetail}}" hint-placeholder-val="{{false}}">
+        <div data-screen-label="Trade Detail" style="padding:20px 28px 40px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:12px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:11px;color:{{c.textMuted}};margin-bottom:8px;">Stocks traded that day — click a chart to open</div>
+              <div style="display:flex;gap:10px;overflow-x:auto;">
+                <sc-for list="{{dayTrades}}" as="dt" hint-placeholder-count="3">
+                  <div onClick="{{dt.onClick}}" style="flex:none;min-width:140px;background:{{c.surface}};border:1px solid {{dt.borderColor}};border-radius:9px;padding:10px 12px;cursor:pointer;" style-hover="border-color:{{c.accent}};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                      <div style="font-weight:800;font-family:ui-monospace,monospace;">{{dt.symbol}}</div>
+                      <svg width="40" height="18" viewBox="0 0 40 18" style="flex:none;">
+                        <defs>
+                          <linearGradient id="tdspark-{{$index}}" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="{{dt.stockColor}}" stop-opacity="0.55"></stop>
+                            <stop offset="100%" stop-color="{{dt.stockColor}}" stop-opacity="0"></stop>
+                          </linearGradient>
+                        </defs>
+                        <polyline points="{{dt.sparkArea}}" fill="url(#tdspark-{{$index}})" stroke="none"></polyline>
+                        <polyline points="{{dt.sparkPoints}}" fill="none" stroke="{{dt.stockColor}}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                      </svg>
+                    </div>
+                    <div style="font-size:15px;font-weight:700;font-family:ui-monospace,monospace;color:{{dt.pnlColor}};margin-top:4px;">{{dt.pnlText}}</div>
+                    <div style="font-size:10.5px;color:{{c.textMuted}};margin-top:2px;">{{dt.time}}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="position:relative;flex:none;">
+              <div onClick="{{toggleDayPicker}}" style="font-size:12px;padding:7px 12px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};color:{{c.textSecondary}};cursor:pointer;display:flex;align-items:center;gap:6px;">📅 {{dayRangeLabel}} ▾</div>
+              <sc-if value="{{showDayPicker}}" hint-placeholder-val="{{false}}">
+                <div style="position:absolute;right:0;top:36px;z-index:10;background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);width:230px;">
+                  <div style="font-size:9.5px;color:{{c.textMuted}};margin-bottom:6px;">Click a day, then another to set a range</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div onClick="{{dayPrevMonth}}" style="width:22px;height:22px;border-radius:5px;background:{{c.surface2}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;">‹</div>
+                    <div style="font-size:11.5px;font-weight:700;">{{dayPickerMonthLabel}}</div>
+                    <div onClick="{{dayNextMonth}}" style="width:22px;height:22px;border-radius:5px;background:{{c.surface2}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;">›</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:9px;color:{{c.textMuted}};margin-bottom:3px;">
+                    <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                  </div>
+                  <sc-for list="{{pickerWeeks}}" as="week" hint-placeholder-count="5">
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">
+                      <sc-for list="{{week}}" as="cell" hint-placeholder-count="7">
+                        <div onClick="{{cell.onClick}}" onMouseEnter="{{cell.onHover}}" style="aspect-ratio:1;border-radius:5px;background:{{cell.bg}};display:flex;align-items:center;justify-content:center;font-size:9.5px;color:#fff;cursor:{{cell.cursor}};border:{{cell.ring}};box-sizing:border-box;">{{cell.dayNum}}</div>
+                      </sc-for>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div onClick="{{backToFrom}}" style="font-size:12px;color:{{c.textMuted}};cursor:pointer;">← {{fromLabel}}</div>
+              <div style="width:1px;height:14px;background:{{c.border}};"></div>
+              <div style="font-size:16px;font-weight:700;font-family:ui-monospace,monospace;">{{td.symbol}}</div>
+              <div style="font-size:12px;color:{{c.textMuted}};">{{td.dateFull}} · {{td.time}} ET</div>
+              <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;background:{{td.sideBg}};color:{{td.sideColor}};">{{td.sideLabel}}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="display:flex;gap:6px;">
+                <sc-for list="{{stateToggles.chart}}" as="opt" hint-placeholder-count="3">
+                  <div onClick="{{opt.onClick}}" style="font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer;background:{{opt.bg}};color:{{opt.color}};border:1px solid {{c.border}};">{{opt.label}}</div>
+                </sc-for>
+              </div>
+              <div onClick="{{prevTradeFn}}" style="width:30px;height:30px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:{{prevOpacity}};">‹</div>
+              <div onClick="{{nextTradeFn}}" style="width:30px;height:30px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:{{nextOpacity}};">›</div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:12px;min-width:0;">
+              <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:16px;box-shadow:{{c.cardShadow}};">
+                <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.04em;">Net P&amp;L</div>
+                <div style="font-size:26px;font-weight:800;font-family:ui-monospace,monospace;color:{{td.netColor}};margin-top:4px;">{{td.netText}}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;font-size:12px;">
+                  <div><div style="color:{{c.textMuted}};font-size:10.5px;">Shares</div><div style="font-family:ui-monospace,monospace;font-weight:600;margin-top:2px;">{{td.qty}}</div></div>
+                  <div><div style="color:{{c.textMuted}};font-size:10.5px;">Gross P&amp;L</div><div style="font-family:ui-monospace,monospace;font-weight:600;margin-top:2px;color:{{td.grossColor}};">{{td.grossText}}</div></div>
+                  <div><div style="color:{{c.textMuted}};font-size:10.5px;">Rating</div><div style="margin-top:2px;color:{{c.accent}};letter-spacing:1px;">{{td.stars}}</div></div>
+                  <div><div style="color:{{c.textMuted}};font-size:10.5px;">MAE / MFE</div><div style="font-family:ui-monospace,monospace;margin-top:2px;"><span style="color:{{c.loss}};">{{td.maeText}}</span> / <span style="color:{{c.win}};">{{td.mfeText}}</span></div></div>
+                  <div><div style="color:{{c.textMuted}};font-size:10.5px;">Planned / Real R</div><div style="font-family:ui-monospace,monospace;margin-top:2px;">{{td.plannedR}} / {{td.realizedR}}</div></div>
+                  <div><div style="color:{{c.textMuted}};font-size:10.5px;">Profit Target</div><div style="font-family:ui-monospace,monospace;margin-top:2px;color:{{c.win}};">{{td.targetText}}</div></div>
+                  <div><div style="color:{{c.textMuted}};font-size:10.5px;">Stop Loss</div><div style="font-family:ui-monospace,monospace;margin-top:2px;color:{{c.loss}};">{{td.stopText}}</div></div>
+                </div>
+              </div>
+
+              <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:14px 16px;box-shadow:{{c.cardShadow}};">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div style="font-size:11px;font-weight:700;color:#eab308;">Mistakes</div></div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+                  <sc-for list="{{td.mistakeChips}}" as="chip" hint-placeholder-count="2">
+                    <div style="font-size:11px;padding:4px 8px 4px 9px;border-radius:12px;background:rgba(234,179,8,0.12);color:#eab308;display:flex;align-items:center;gap:5px;">{{chip}}<span style="cursor:pointer;opacity:0.7;">×</span></div>
+                  </sc-for>
+                  <sc-if value="{{td.noMistakes}}" hint-placeholder-val="{{false}}"><div style="font-size:11px;color:{{c.textMuted}};">None tagged</div></sc-if>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:{{c.accent}};margin-bottom:6px;">Habits</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+                  <sc-for list="{{td.habitChips}}" as="chip" hint-placeholder-count="1">
+                    <div style="font-size:11px;padding:4px 8px 4px 9px;border-radius:12px;background:{{c.accentSoft}};color:{{c.accent}};display:flex;align-items:center;gap:5px;">{{chip}}<span style="cursor:pointer;opacity:0.7;">×</span></div>
+                  </sc-for>
+                  <sc-if value="{{td.noHabits}}" hint-placeholder-val="{{false}}"><div style="font-size:11px;color:{{c.textMuted}};">None tagged</div></sc-if>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;min-width:0;">
+              <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;box-shadow:{{c.cardShadow}};overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid {{c.border}};">
+                  <div style="display:flex;gap:6px;">
+                    <sc-for list="{{timeframes}}" as="tf" hint-placeholder-count="3">
+                      <div onClick="{{tf.onClick}}" style="font-size:11.5px;padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:600;background:{{tf.bg}};color:{{tf.color}};">{{tf.label}}</div>
+                    </sc-for>
+                  </div>
+                  <div style="font-size:11px;color:{{c.textMuted}};">{{td.symbol}} · 1s fills</div>
+                </div>
+
+                <sc-if value="{{chartLoading}}" hint-placeholder-val="{{false}}">
+                  <div style="height:380px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:{{c.textMuted}};">
+                    <div style="width:26px;height:26px;border-radius:50%;border:3px solid {{c.border}};border-top-color:{{c.accent}};"></div>
+                    <div style="font-size:12px;">Loading chart data…</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{chartEmpty}}" hint-placeholder-val="{{false}}">
+                  <div style="height:380px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:{{c.textMuted}};">
+                    <div style="font-size:26px;">⌁</div>
+                    <div style="font-size:13px;font-weight:600;color:{{c.textSecondary}};">No market data for this session</div>
+                    <div style="font-size:11.5px;">Historical 1-minute bars aren't available for this symbol/date.</div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{chartData}}" hint-placeholder-val="{{true}}">
+                  <div style="position:relative;height:300px;background:{{c.surface}};overflow:hidden;">
+                    <div style="{{chart.riskZoneStyle}}"></div>
+                    <div style="{{chart.rewardZoneStyle}}"></div>
+                    <sc-for list="{{chart.gridLines}}" as="g" hint-placeholder-count="5">
+                      <div style="{{g.style}}"></div>
+                    </sc-for>
+                    <sc-for list="{{chart.bars}}" as="bar" hint-placeholder-count="40">
+                      <div style="{{bar.wickStyle}}"></div>
+                      <div style="{{bar.bodyStyle}}"></div>
+                    </sc-for>
+                    <div style="{{chart.entryLineStyle}}"></div>
+                    <sc-for list="{{chart.corners}}" as="corner" hint-placeholder-count="4">
+                      <div style="{{corner}}"></div>
+                    </sc-for>
+                    <div style="{{chart.targetLabelStyle}}">{{chart.targetPillText}}</div>
+                    <div style="{{chart.stopLabelStyle}}">{{chart.stopPillText}}</div>
+                    <div style="{{chart.centerPillStyle}}">{{chart.centerPillText}}</div>
+                    <sc-for list="{{chart.badges}}" as="bd" hint-placeholder-count="3">
+                      <div style="{{bd.style}}">{{bd.label}}</div>
+                    </sc-for>
+                    <sc-for list="{{chart.markers}}" as="m" hint-placeholder-count="4">
+                      <div style="{{m.dotStyle}}"></div>
+                    </sc-for>
+                  </div>
+                  <div style="position:relative;height:70px;background:{{c.surface2}};border-top:1px solid {{c.border}};">
+                    <sc-for list="{{chart.volBars}}" as="v" hint-placeholder-count="40">
+                      <div style="{{v.style}}"></div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;box-shadow:{{c.cardShadow}};">
+                <div style="display:flex;gap:4px;padding:10px 14px 0;border-bottom:1px solid {{c.border}};">
+                  <sc-for list="{{noteTabs}}" as="tab" hint-placeholder-count="3">
+                    <div onClick="{{tab.onClick}}" style="font-size:12.5px;font-weight:600;padding:8px 12px;cursor:pointer;color:{{tab.color}};border-bottom:2px solid {{tab.borderColor}};">{{tab.label}}</div>
+                  </sc-for>
+                </div>
+
+                <sc-if value="{{isNotesTab}}" hint-placeholder-val="{{true}}">
+                  <div style="padding:14px 16px;">
+                    <div style="display:flex;gap:4px;margin-bottom:10px;color:{{c.textMuted}};font-size:14px;">
+                      <div style="padding:5px 8px;border-radius:5px;cursor:pointer;" style-hover="background:{{c.surfaceHover}};"><b>B</b></div>
+                      <div style="padding:5px 8px;border-radius:5px;cursor:pointer;font-style:italic;" style-hover="background:{{c.surfaceHover}};">I</div>
+                      <div style="padding:5px 8px;border-radius:5px;cursor:pointer;text-decoration:underline;" style-hover="background:{{c.surfaceHover}};">U</div>
+                      <div style="width:1px;background:{{c.border}};margin:4px 4px;"></div>
+                      <div style="padding:5px 8px;border-radius:5px;cursor:pointer;" style-hover="background:{{c.surfaceHover}};">≡</div>
+                      <div style="padding:5px 8px;border-radius:5px;cursor:pointer;" style-hover="background:{{c.surfaceHover}};">🔗</div>
+                      <div style="padding:5px 8px;border-radius:5px;cursor:pointer;" style-hover="background:{{c.surfaceHover}};">🖼</div>
+                    </div>
+                    <textarea value="{{noteText}}" onChange="{{onNoteChange}}" placeholder="What was the plan? What actually happened?" style="width:100%;min-height:110px;background:{{c.surface2}};border:1px solid {{c.border}};border-radius:7px;padding:10px 12px;font-size:13px;color:{{c.textPrimary}};resize:vertical;box-sizing:border-box;line-height:1.5;"></textarea>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+                      <div style="font-size:11px;color:{{c.textMuted}};">Last edited {{td.lastEdited}}</div>
+                      <div style="font-size:11.5px;display:flex;align-items:center;gap:5px;color:{{autosaveColor}};"><span>{{autosaveDot}}</span>{{autosaveLabel}}</div>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{isExecutionsTab}}" hint-placeholder-val="{{false}}">
+                  <div style="padding:6px 16px 14px;">
+                    <div style="display:grid;grid-template-columns:110px 90px 90px 1fr;padding:8px 4px;font-size:10.5px;color:{{c.textMuted}};text-transform:uppercase;">
+                      <div>Time</div><div style="text-align:right;">Price</div><div style="text-align:right;">Qty</div><div style="text-align:right;">Side</div>
+                    </div>
+                    <sc-for list="{{td.executions}}" as="ex" hint-placeholder-count="2">
+                      <div style="display:grid;grid-template-columns:110px 90px 90px 1fr;padding:8px 4px;font-size:12.5px;border-top:1px solid {{c.border}};">
+                        <div style="font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{ex.time}}</div>
+                        <div style="text-align:right;font-family:ui-monospace,monospace;">{{ex.price}}</div>
+                        <div style="text-align:right;font-family:ui-monospace,monospace;">{{ex.qty}}</div>
+                        <div style="text-align:right;color:{{ex.color}};font-weight:600;font-size:11px;">{{ex.side}}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{isAttachmentsTab}}" hint-placeholder-val="{{false}}">
+                  <div style="padding:40px 16px;text-align:center;color:{{c.textMuted}};">
+                    <div style="font-size:22px;margin-bottom:8px;">📎</div>
+                    <div style="font-size:12.5px;">No attachments yet. Paste a screenshot into the notes field to attach one.</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===================== DAILY JOURNAL ===================== -->
+      <sc-if value="{{isJournal}}" hint-placeholder-val="{{false}}">
+        <div data-screen-label="Daily Journal" style="padding:24px 28px 40px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div onClick="{{journalPrevDay}}" style="width:28px;height:28px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};display:flex;align-items:center;justify-content:center;cursor:pointer;">‹</div>
+              <div style="position:relative;">
+                <div onClick="{{toggleJournalPicker}}" style="font-size:16px;font-weight:700;min-width:170px;cursor:pointer;padding:4px 8px;margin:-4px -8px;border-radius:6px;transition:background 0.15s ease,color 0.15s ease;" style-hover="background:rgba(139,92,246,0.16);color:#a78bfa;">{{journalDateLabel}}</div>
+                <sc-if value="{{showJournalPicker}}" hint-placeholder-val="{{false}}">
+                  <div style="position:absolute;left:0;top:30px;z-index:10;background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);width:230px;">
+                    <div style="font-size:9.5px;color:{{c.textMuted}};margin-bottom:6px;">Select a day</div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:9px;color:{{c.textMuted}};margin-bottom:3px;">
+                      <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                    </div>
+                    <sc-for list="{{journalPickerWeeks}}" as="week" hint-placeholder-count="5">
+                      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">
+                        <sc-for list="{{week}}" as="cell" hint-placeholder-count="7">
+                          <div onClick="{{cell.onClick}}" style="aspect-ratio:1;border-radius:5px;background:{{cell.bg}};display:flex;align-items:center;justify-content:center;font-size:9.5px;color:#fff;cursor:{{cell.cursor}};border:{{cell.ring}};box-sizing:border-box;">{{cell.dayNum}}</div>
+                        </sc-for>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+              <div onClick="{{journalNextDay}}" style="width:28px;height:28px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};display:flex;align-items:center;justify-content:center;cursor:pointer;">›</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <sc-for list="{{stateToggles.journal}}" as="opt" hint-placeholder-count="3">
+                <div onClick="{{opt.onClick}}" style="font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer;background:{{opt.bg}};color:{{opt.color}};border:1px solid {{c.border}};">{{opt.label}}</div>
+              </sc-for>
+            </div>
+          </div>
+
+          <sc-if value="{{journalEmpty}}" hint-placeholder-val="{{false}}">
+            <div style="border:1px dashed {{c.borderStrong}};border-radius:12px;padding:60px 24px;text-align:center;color:{{c.textMuted}};">
+              <div style="font-size:28px;margin-bottom:10px;">✎</div>
+              <div style="font-size:14px;font-weight:600;color:{{c.textSecondary}};">No trades this day</div>
+              <div style="font-size:12.5px;margin-top:4px;">Nothing was logged on {{journalDateLabel}}. Jump to another day with a trade to journal.</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{journalLoading}}" hint-placeholder-val="{{false}}">
+            <div style="height:80px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};margin-bottom:14px;"></div>
+            <div style="height:70px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};margin-bottom:14px;"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div style="height:160px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};"></div>
+              <div style="height:160px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};"></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{journalData}}" hint-placeholder-val="{{true}}">
+            <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:14px 18px;box-shadow:{{c.cardShadow}};margin-bottom:14px;display:flex;align-items:center;gap:28px;">
+              <div><div style="font-size:10.5px;color:{{c.textMuted}};text-transform:uppercase;">Day Net P&amp;L</div><div style="font-size:20px;font-weight:800;font-family:ui-monospace,monospace;color:{{journalDay.pnlColor}};">{{journalDay.pnlText}}</div></div>
+              <div><div style="font-size:10.5px;color:{{c.textMuted}};text-transform:uppercase;">Trades</div><div style="font-size:20px;font-weight:800;font-family:ui-monospace,monospace;">{{journalDay.count}}</div></div>
+              <div><div style="font-size:10.5px;color:{{c.textMuted}};text-transform:uppercase;">Win Rate</div><div style="font-size:20px;font-weight:800;font-family:ui-monospace,monospace;">{{journalDay.winRate}}</div></div>
+            </div>
+
+            <div style="margin-bottom:14px;">
+              <div style="font-size:11.5px;color:{{c.textMuted}};margin-bottom:8px;">Trades — click to open</div>
+              <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;">
+                <sc-for list="{{journalDay.trades}}" as="t" hint-placeholder-count="3">
+                  <div onClick="{{t.onClick}}" style="flex:none;min-width:150px;background:{{c.surface}};border:1px solid {{c.border}};border-radius:9px;padding:10px 12px;cursor:pointer;" style-hover="border-color:{{c.accent}};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                      <div style="font-weight:700;font-family:ui-monospace,monospace;">{{t.symbol}}</div>
+                      <svg width="40" height="18" viewBox="0 0 40 18" style="flex:none;">
+                        <defs>
+                          <linearGradient id="jspark-{{$index}}" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="{{t.stockColor}}" stop-opacity="0.55"></stop>
+                            <stop offset="100%" stop-color="{{t.stockColor}}" stop-opacity="0"></stop>
+                          </linearGradient>
+                        </defs>
+                        <polyline points="{{t.sparkArea}}" fill="url(#jspark-{{$index}})" stroke="none"></polyline>
+                        <polyline points="{{t.sparkPoints}}" fill="none" stroke="{{t.stockColor}}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                      </svg>
+                    </div>
+                    <div style="font-size:15px;font-weight:700;font-family:ui-monospace,monospace;color:{{t.pnlColor}};margin-top:4px;">{{t.pnlText}}</div>
+                    <div style="font-size:10.5px;color:{{c.textMuted}};margin-top:2px;">{{t.time}}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ===================== REPORTS ===================== -->
+      <sc-if value="{{isReports}}" hint-placeholder-val="{{false}}">
+        <div data-screen-label="Reports" style="padding:24px 28px 40px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div>
+              <div style="font-size:19px;font-weight:700;">Reports &amp; Insights</div>
+              <div style="font-size:12.5px;color:{{c.textMuted}};margin-top:2px;">Where the edge shows up — and where it leaks</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="position:relative;">
+                <div onClick="{{reports.toggleReportsPicker}}" style="font-size:12px;padding:7px 12px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};color:{{c.textSecondary}};cursor:pointer;display:flex;align-items:center;gap:6px;">📅 {{reports.reportsRangeLabel}} ▾</div>
+                <sc-if value="{{reports.showReportsPicker}}" hint-placeholder-val="{{false}}">
+                  <div style="position:absolute;right:0;top:36px;z-index:10;background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);width:230px;">
+                    <div style="font-size:9.5px;color:{{c.textMuted}};margin-bottom:6px;">Click a day, then another to set a range</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                      <div onClick="{{reports.reportsPrevMonth}}" style="width:22px;height:22px;border-radius:5px;background:{{c.surface2}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;">‹</div>
+                      <div style="font-size:11.5px;font-weight:700;">{{reports.reportsPickerMonthLabel}}</div>
+                      <div onClick="{{reports.reportsNextMonth}}" style="width:22px;height:22px;border-radius:5px;background:{{c.surface2}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;">›</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:9px;color:{{c.textMuted}};margin-bottom:3px;">
+                      <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                    </div>
+                    <sc-for list="{{reports.reportsPickerWeeks}}" as="week" hint-placeholder-count="5">
+                      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">
+                        <sc-for list="{{week}}" as="cell" hint-placeholder-count="7">
+                          <div onClick="{{cell.onClick}}" onMouseEnter="{{cell.onHover}}" style="aspect-ratio:1;border-radius:5px;background:{{cell.bg}};display:flex;align-items:center;justify-content:center;font-size:9.5px;color:#fff;cursor:{{cell.cursor}};border:{{cell.ring}};box-sizing:border-box;">{{cell.dayNum}}</div>
+                        </sc-for>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <sc-for list="{{stateToggles.reports}}" as="opt" hint-placeholder-count="3">
+                  <div onClick="{{opt.onClick}}" style="font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer;background:{{opt.bg}};color:{{opt.color}};border:1px solid {{c.border}};">{{opt.label}}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <sc-if value="{{reportsEmpty}}" hint-placeholder-val="{{false}}">
+            <div style="border:1px dashed {{c.borderStrong}};border-radius:12px;padding:60px 24px;text-align:center;color:{{c.textMuted}};">
+              <div style="font-size:28px;margin-bottom:10px;">▤</div>
+              <div style="font-size:14px;font-weight:600;color:{{c.textSecondary}};">Not enough trades yet</div>
+              <div style="font-size:12.5px;margin-top:4px;">Insights need a larger sample size to be meaningful — log more trades to unlock this view.</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{reportsLoading}}" hint-placeholder-val="{{false}}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <sc-for list="{{skeletonKpis}}" as="s" hint-placeholder-count="4">
+                <div style="height:220px;border-radius:10px;background:{{c.surface}};border:1px solid {{c.border}};"></div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{reportsData}}" hint-placeholder-val="{{true}}">
+            <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;box-shadow:{{c.cardShadow}};margin-bottom:14px;overflow:hidden;">
+              <div style="font-size:15px;font-weight:700;padding:14px 18px;">Stats</div>
+              <sc-for list="{{reports.statRows}}" as="row" hint-placeholder-count="10">
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid {{c.border}};">
+                  <sc-for list="{{row}}" as="cell" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 18px;border-left:1px solid {{c.border}};">
+                      <div style="font-size:12.5px;color:{{c.textMuted}};">{{cell.label}}</div>
+                      <div style="font-size:13.5px;font-weight:700;font-family:ui-monospace,monospace;color:{{cell.color}};white-space:nowrap;">{{cell.value}}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+              <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:16px 18px;box-shadow:{{c.cardShadow}};min-width:0;">
+                <div style="font-size:12.5px;font-weight:700;margin-bottom:12px;">Win Rate by Time of Day</div>
+                <sc-for list="{{reports.byTime}}" as="b" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;">
+                    <div style="width:110px;font-size:11.5px;color:{{c.textSecondary}};">{{b.label}}</div>
+                    <div style="flex:1;height:10px;border-radius:5px;background:{{c.surface2}};overflow:hidden;"><div style="height:100%;width:{{b.pct}};background:{{b.color}};"></div></div>
+                    <div style="width:40px;text-align:right;font-size:11px;font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{b.pctText}}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:16px 18px;box-shadow:{{c.cardShadow}};min-width:0;">
+                <div style="font-size:12.5px;font-weight:700;margin-bottom:12px;">Win Rate by Day of Week</div>
+                <sc-for list="{{reports.byDow}}" as="b" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;">
+                    <div style="width:110px;font-size:11.5px;color:{{c.textSecondary}};">{{b.label}}</div>
+                    <div style="flex:1;height:10px;border-radius:5px;background:{{c.surface2}};overflow:hidden;"><div style="height:100%;width:{{b.pct}};background:{{b.color}};"></div></div>
+                    <div style="width:40px;text-align:right;font-size:11px;font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{b.pctText}}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:16px 18px;box-shadow:{{c.cardShadow}};margin-bottom:14px;">
+              <div style="font-size:12.5px;font-weight:700;margin-bottom:14px;">R-Multiple Analysis</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin-bottom:18px;">
+                <sc-for list="{{reports.rStats}}" as="rs" hint-placeholder-count="5">
+                  <div>
+                    <div style="font-size:10.5px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.04em;">{{rs.label}}</div>
+                    <div style="font-size:17px;font-weight:700;font-family:ui-monospace,monospace;color:{{rs.color}};margin-top:4px;">{{rs.value}}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size:11px;color:{{c.textMuted}};margin-bottom:8px;">Average R by trading day — spot your worst days</div>
+              <div style="display:flex;align-items:flex-end;gap:6px;height:130px;overflow-x:auto;padding-bottom:2px;">
+                <sc-for list="{{reports.rHistogram}}" as="rh" hint-placeholder-count="14">
+                  <div style="flex:0 0 34px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;">
+                    <div style="font-size:9.5px;color:{{c.textSecondary}};font-family:ui-monospace,monospace;white-space:nowrap;">{{rh.count}}</div>
+                    <div style="width:100%;height:{{rh.barHeight}};background:{{rh.color}};border-radius:3px;min-height:2px;"></div>
+                    <div style="font-size:8.5px;color:{{c.textMuted}};text-align:center;white-space:nowrap;transform:rotate(-40deg);transform-origin:top center;margin-top:4px;">{{rh.label}}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:16px 18px;box-shadow:{{c.cardShadow}};">
+              <div style="font-size:12.5px;font-weight:700;margin-bottom:12px;">Average Price of Stocks Traded</div>
+              <sc-for list="{{reports.byAvgPrice}}" as="b" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;">
+                  <div style="width:60px;font-size:11.5px;color:{{c.textSecondary}};font-family:ui-monospace,monospace;font-weight:700;">{{b.label}}</div>
+                  <div style="flex:1;height:10px;border-radius:5px;background:{{c.surface2}};overflow:hidden;"><div style="height:100%;width:{{b.pct}};background:{{b.color}};"></div></div>
+                  <div style="width:60px;text-align:right;font-size:11px;font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{b.pctText}}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ===================== SETTINGS ===================== -->
+      <sc-if value="{{isSettings}}" hint-placeholder-val="{{false}}">
+        <div data-screen-label="Settings" style="padding:24px 28px 40px;max-width:1040px;">
+          <div style="font-size:19px;font-weight:700;margin-bottom:2px;">Settings</div>
+          <div style="font-size:12.5px;color:{{c.textMuted}};margin-bottom:18px;">Connections, accounts, and how the app looks and imports data</div>
+
+          <div style="background:{{tosCardBg}};border:1px solid {{tosCardBorder}};border-radius:12px;padding:20px 22px;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:10.5px;font-weight:800;letter-spacing:0.04em;padding:4px 9px;border-radius:5px;background:{{tosBadgeBg}};color:{{tosBadgeColor}};">{{tosBadge}}</span>
+              <div style="font-size:16px;font-weight:700;">thinkorswim connection</div>
+            </div>
+            <div style="font-size:12.5px;color:{{c.textSecondary}};line-height:1.55;max-width:640px;margin-bottom:16px;">{{tosMessage}}</div>
+            <div style="display:flex;gap:40px;flex-wrap:wrap;margin-bottom:18px;">
+              <div>
+                <div style="font-size:10px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Last Linked</div>
+                <div style="font-size:12.5px;font-family:ui-monospace,monospace;">{{tosLastLinked}}</div>
+              </div>
+              <div>
+                <div style="font-size:10px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">{{tosExpiredLabel}}</div>
+                <div style="font-size:12.5px;font-family:ui-monospace,monospace;">{{tosExpiredValue}}</div>
+              </div>
+              <div>
+                <div style="font-size:10px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Last Synced</div>
+                <div style="font-size:12.5px;font-family:ui-monospace,monospace;">{{tosLastSynced}}</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <sc-if value="{{tosState}}" hint-placeholder-val="{{false}}">
+                <div onClick="{{tosReauth}}" style="padding:10px 18px;border-radius:8px;background:{{c.accent}};color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Re-authorize</div>
+              </sc-if>
+              <div onClick="{{tosSyncNow}}" style="padding:10px 18px;border-radius:8px;background:{{c.surface2}};border:1px solid {{c.border}};color:{{c.textSecondary}};font-size:13px;font-weight:600;cursor:pointer;">Sync now</div>
+              <div onClick="{{tosDisconnect}}" style="padding:10px 18px;border-radius:8px;background:transparent;border:1px solid {{c.border}};color:{{c.textMuted}};font-size:13px;font-weight:600;cursor:pointer;">Disconnect</div>
+            </div>
+          </div>
+
+          <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:18px 20px;box-shadow:{{c.cardShadow}};margin-bottom:16px;">
+            <div style="font-size:15px;font-weight:700;margin-bottom:10px;">Import trades</div>
+            <div style="font-size:12.5px;color:{{c.textMuted}};margin-bottom:14px;">Upload a CSV export from thinkorswim (or any broker) to backfill trade history.</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <label style="padding:10px 18px;border-radius:8px;background:{{c.accent}};color:#fff;font-size:13px;font-weight:700;cursor:pointer;">
+                Choose CSV file
+                <input type="file" accept=".csv" onChange="{{csvOnSelect}}" style="display:none;"></input>
+              </label>
+              <sc-if value="{{csvImporting}}" hint-placeholder-val="{{false}}">
+                <div style="font-size:12.5px;color:{{c.textMuted}};">Importing {{csvFileName}}…</div>
+              </sc-if>
+              <sc-if value="{{csvFileName}}" hint-placeholder-val="{{false}}">
+                <div style="font-size:12.5px;color:{{c.win}};">✓ {{csvFileName}} imported</div>
+              </sc-if>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:18px 20px;box-shadow:{{c.cardShadow}};">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <div style="font-size:15px;font-weight:700;">Accounts</div>
+                <div style="font-size:12.5px;color:{{c.accent}};cursor:pointer;font-weight:600;">+ Add account</div>
+              </div>
+              <sc-for list="{{settingsAccounts}}" as="a" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid {{c.border}};">
+                  <div>
+                    <div style="font-size:13px;font-weight:600;">{{a.name}}</div>
+                    <div style="font-size:11.5px;color:{{c.textMuted}};margin-top:2px;font-family:ui-monospace,monospace;">{{a.mask}}</div>
+                  </div>
+                  <div style="font-size:12px;color:{{c.textMuted}};cursor:pointer;">Edit</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:18px 20px;box-shadow:{{c.cardShadow}};">
+              <div style="font-size:15px;font-weight:700;margin-bottom:14px;">Display</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid {{c.border}};">
+                <div>
+                  <div style="font-size:13px;font-weight:600;">Display timezone</div>
+                  <div style="font-size:11.5px;color:{{c.textMuted}};margin-top:2px;">Used for the secondary "local" time everywhere</div>
+                </div>
+                <div onClick="{{cycleTimezone}}" style="font-size:12.5px;padding:7px 12px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};color:{{c.textSecondary}};cursor:pointer;">{{displayTimezoneLabel}} ⌄</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid {{c.border}};">
+                <div>
+                  <div style="font-size:13px;font-weight:600;">Colorblind-safe palette</div>
+                  <div style="font-size:11.5px;color:{{c.textMuted}};margin-top:2px;max-width:220px;">P&amp;L is this app's most important signal — swap it to blue/orange</div>
+                </div>
+                <div style="display:flex;border-radius:8px;border:1px solid {{c.border}};overflow:hidden;">
+                  <div onClick="{{setPaletteGreenRed}}" style="padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;background:{{paletteGreenBg}};color:{{paletteGreenColor}};">Green / Red</div>
+                  <div onClick="{{setPaletteBlueOrange}}" style="padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;background:{{paletteBlueBg}};color:{{paletteBlueColor}};">Blue / Orange</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===================== COMPONENTS ===================== -->
+      <sc-if value="{{isComponents}}" hint-placeholder-val="{{false}}">
+        <div data-screen-label="Components" style="padding:24px 28px 48px;">
+          <div style="font-size:19px;font-weight:700;margin-bottom:2px;">Component Inventory</div>
+          <div style="font-size:12.5px;color:{{c.textMuted}};margin-bottom:20px;">Toggle Dark/Light in the sidebar to compare — every component below uses the live theme.</div>
+
+          <div style="display:flex;flex-direction:column;gap:22px;">
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Buttons</div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <div style="padding:9px 16px;border-radius:7px;background:{{c.accent}};color:#fff;font-size:13px;font-weight:600;cursor:pointer;">Primary</div>
+                <div style="padding:9px 16px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};color:{{c.textPrimary}};font-size:13px;font-weight:600;cursor:pointer;">Secondary</div>
+                <div style="padding:9px 16px;border-radius:7px;background:transparent;color:{{c.textSecondary}};font-size:13px;font-weight:600;cursor:pointer;">Ghost</div>
+                <div style="padding:6px 12px;border-radius:6px;background:{{c.accent}};color:#fff;font-size:11.5px;font-weight:600;cursor:pointer;">Small</div>
+                <div style="padding:9px 16px;border-radius:7px;background:{{c.accent}};opacity:0.45;color:#fff;font-size:13px;font-weight:600;">Disabled</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Inputs &amp; Select</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <input placeholder="Symbol" style="width:160px;padding:8px 12px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};color:{{c.textPrimary}};font-size:13px;">
+                <input placeholder="Focused state" style="width:160px;padding:8px 12px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.accent}};box-shadow:0 0 0 3px {{c.accentSoft}};color:{{c.textPrimary}};font-size:13px;">
+                <div style="width:160px;padding:8px 12px;border-radius:7px;background:{{c.surface2}};border:1px solid {{c.border}};color:{{c.textSecondary}};font-size:13px;display:flex;align-items:center;justify-content:space-between;">Status ▾</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Chips / Tags</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <div style="font-size:11px;padding:4px 10px;border-radius:12px;background:rgba(234,179,8,0.12);color:#eab308;">Mistake · chased</div>
+                <div style="font-size:11px;padding:4px 10px;border-radius:12px;background:{{c.accentSoft}};color:{{c.accent}};">Habit · followed plan</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Badges (Win / Loss / Breakeven)</div>
+              <div style="display:flex;gap:8px;">
+                <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:{{c.winSoft}};color:{{c.win}};">+$232.00</div>
+                <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:{{c.lossSoft}};color:{{c.loss}};">-$108.00</div>
+                <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:{{c.surface2}};color:{{c.textMuted}};">$0.00</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Clickable Table Row (default / hover / selected)</div>
+              <div style="border:1px solid {{c.border}};border-radius:8px;overflow:hidden;max-width:420px;">
+                <div style="display:flex;justify-content:space-between;padding:9px 14px;font-size:12.5px;">SOFI · Jul 16 <span style="color:{{c.win}};font-family:ui-monospace,monospace;">+$462.00</span></div>
+                <div style="display:flex;justify-content:space-between;padding:9px 14px;font-size:12.5px;background:{{c.surfaceHover}};border-top:1px solid {{c.border}};">MULN · Jul 14 (hover) <span style="color:{{c.win}};font-family:ui-monospace,monospace;">+$224.00</span></div>
+                <div style="display:flex;justify-content:space-between;padding:9px 14px;font-size:12.5px;background:{{c.accentSoft}};border-top:1px solid {{c.border}};">ATER · Jul 6 (selected) <span style="color:{{c.loss}};font-family:ui-monospace,monospace;">-$108.00</span></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">KPI Card &amp; Stat Block</div>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:14px 16px;box-shadow:{{c.cardShadow}};width:160px;">
+                  <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;">Net P&amp;L</div>
+                  <div style="font-size:20px;font-weight:700;font-family:ui-monospace,monospace;color:{{c.win}};margin-top:6px;">+$1,240.50</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <div style="font-size:10.5px;color:{{c.textMuted}};">Shares</div>
+                  <div style="font-size:14px;font-weight:600;font-family:ui-monospace,monospace;">800</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Tabs</div>
+              <div style="display:flex;gap:4px;border-bottom:1px solid {{c.border}};max-width:320px;">
+                <div style="font-size:12.5px;font-weight:600;padding:8px 12px;color:{{c.textPrimary}};border-bottom:2px solid {{c.accent}};">Notes</div>
+                <div style="font-size:12.5px;font-weight:600;padding:8px 12px;color:{{c.textMuted}};border-bottom:2px solid transparent;">Executions</div>
+                <div style="font-size:12.5px;font-weight:600;padding:8px 12px;color:{{c.textMuted}};border-bottom:2px solid transparent;">Attachments</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Chart Execution Markers</div>
+              <div style="display:flex;gap:16px;align-items:center;">
+                <div style="width:20px;height:20px;border-radius:50%;background:{{c.chartUp}};color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">↑</div>
+                <div style="font-size:11.5px;color:{{c.textSecondary}};">Entry — price, time, share count</div>
+                <div style="width:20px;height:20px;border-radius:50%;background:{{c.chartDown}};color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">↓</div>
+                <div style="font-size:11.5px;color:{{c.textSecondary}};">Exit — price, time, share count</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Note Editor Toolbar &amp; Autosave</div>
+              <div style="display:flex;gap:4px;color:{{c.textMuted}};font-size:14px;margin-bottom:8px;">
+                <div style="padding:5px 8px;"><b>B</b></div><div style="padding:5px 8px;font-style:italic;">I</div><div style="padding:5px 8px;">≡</div><div style="padding:5px 8px;">🔗</div>
+              </div>
+              <div style="display:flex;gap:14px;font-size:11.5px;">
+                <span style="color:{{c.win}};">● Saved</span><span style="color:{{c.accent}};">◐ Saving…</span><span style="color:#eab308;">● Unsaved changes</span>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Empty State</div>
+              <div style="border:1px dashed {{c.borderStrong}};border-radius:10px;padding:24px;text-align:center;color:{{c.textMuted}};max-width:320px;font-size:12px;">No data yet — this pattern repeats across every screen.</div>
+            </div>
+
+            <div>
+              <div style="font-size:11px;color:{{c.textMuted}};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Loading Skeleton</div>
+              <div style="display:flex;gap:8px;">
+                <div style="width:100px;height:60px;border-radius:8px;background:{{c.surface}};border:1px solid {{c.border}};"></div>
+                <div style="width:100px;height:60px;border-radius:8px;background:{{c.surface}};border:1px solid {{c.border}};"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===================== TOKENS ===================== -->
+      <sc-if value="{{isTokens}}" hint-placeholder-val="{{false}}">
+        <div data-screen-label="Tokens" style="padding:24px 28px 48px;">
+          <div style="font-size:19px;font-weight:700;margin-bottom:2px;">Token Sheet</div>
+          <div style="font-size:12.5px;color:{{c.textMuted}};margin-bottom:18px;max-width:640px;">Semantic tokens map directly to a Tailwind/shadcn theme config. Spacing, radius and type ramp are theme-independent — one set of values for both modes.</div>
+
+          <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;box-shadow:{{c.cardShadow}};margin-bottom:20px;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 18px;font-size:10.5px;color:{{c.textMuted}};text-transform:uppercase;background:{{c.surface2}};">
+              <div>Token</div><div>Dark</div><div>Light</div>
+            </div>
+            <sc-for list="{{tokenRows}}" as="tk" hint-placeholder-count="12">
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:9px 18px;font-size:12.5px;border-top:1px solid {{c.border}};align-items:center;">
+                <div style="font-family:ui-monospace,monospace;color:{{c.textSecondary}};">{{tk.name}}</div>
+                <div style="display:flex;align-items:center;gap:8px;"><div style="width:16px;height:16px;border-radius:4px;background:{{tk.dark}};border:1px solid rgba(255,255,255,0.1);"></div><span style="font-family:ui-monospace,monospace;font-size:11px;">{{tk.dark}}</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><div style="width:16px;height:16px;border-radius:4px;background:{{tk.light}};border:1px solid rgba(0,0,0,0.1);"></div><span style="font-family:ui-monospace,monospace;font-size:11px;">{{tk.light}}</span></div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+            <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:16px 18px;box-shadow:{{c.cardShadow}};">
+              <div style="font-size:12.5px;font-weight:700;margin-bottom:8px;">Spacing / Radius / Type (theme-independent)</div>
+              <div style="font-size:12px;color:{{c.textSecondary}};line-height:1.7;">Spacing: 4 · 8 · 12 · 16 · 20 · 24 · 32px<br>Radius: 6px (chips) · 8px (inputs) · 10px (cards)<br>Type: 10.5 / 11 / 12.5 / 14 / 16 / 19 / 21px — tabular-nums on all numeric cells<br>Font: system-ui stack; ui-monospace for prices &amp; P&amp;L</div>
+            </div>
+            <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:16px 18px;box-shadow:{{c.cardShadow}};">
+              <div style="font-size:12.5px;font-weight:700;margin-bottom:8px;">Where the themes diverge</div>
+              <div style="font-size:12px;color:{{c.textSecondary}};line-height:1.7;">Win/loss hues are NOT a token swap: dark uses saturated #22c55e / #ef4444 (near-black backdrop lets neon read clean); light uses darkened #0f7a3d / #c0271f — the dark pair goes illegible-neon on white. Elevation also diverges: dark relies on surface lightness only (no shadow), light adds hairline borders + a 1px shadow since surfaces are near-white.</div>
+            </div>
+          </div>
+
+          <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:16px 18px;box-shadow:{{c.cardShadow}};margin-bottom:20px;">
+            <div style="font-size:12.5px;font-weight:700;margin-bottom:8px;">Contrast (WCAG AA)</div>
+            <div style="font-size:12px;color:{{c.textSecondary}};line-height:1.7;">Dark: text-primary on bg ≈ 15:1, win/loss on bg ≈ 8–9:1 — passes AA comfortably.<br>Light: text-primary on bg ≈ 16:1, win #0f7a3d on white ≈ 5.8:1, loss #c0271f on white ≈ 5.2:1 — both pass AA (4.5:1) for normal text.<br>Caution: text-muted in dark (#6b7386 on #0a0e16) ≈ 4.6:1 — fine for body text, avoid for anything below 12px.</div>
+          </div>
+
+          <div style="background:{{c.surface}};border:1px solid {{c.border}};border-radius:10px;padding:0;box-shadow:{{c.cardShadow}};overflow:hidden;">
+            <div style="padding:12px 18px;border-bottom:1px solid {{c.border}};font-size:12.5px;font-weight:700;">CSS Custom Properties</div>
+            <pre style="margin:0;padding:16px 18px;font-size:11.5px;line-height:1.6;font-family:ui-monospace,monospace;color:{{c.textSecondary}};overflow-x:auto;">:root {
+  --bg: #0a0e16;
+  --surface: #12161f;
+  --border: #232937;
+  --text-primary: #e7e9ee;
+  --text-muted: #6b7386;
+  --accent: #8b5cf6;
+  --win: #22c55e;
+  --loss: #ef4444;
+  --radius-sm: 6px; --radius-md: 8px; --radius-lg: 10px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+}
+[data-theme="light"] {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --border: #e4e0d6;
+  --text-primary: #1c1d21;
+  --text-muted: #8b8e96;
+  --accent: #7c3aed;
+  --win: #0f7a3d;
+  --loss: #c0271f;
+}</pre>
+          </div>
+        </div>
+      </sc-if>
+
+</sc-if></div></div></x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    theme: 'dark', screen: 'dashboard', loaded: false, trades: [],
+    selectedTradeId: null, tradeFrom: 'dashboard',
+    dashboardView: 'data', tradesView: 'data', chartView: 'data', journalView: 'data', reportsView: 'data',
+    chartTimeframe: '1m', dayViewDate: null,
+    tradesSortKey: 'date', tradesSortDir: 'desc',
+    journalDate: null, showJournalPicker: false,
+    notesByTradeId: {}, autosaveStatus: 'saved', noteTab: 'notes',
+    showDayPicker: false, showDashPicker: false, dashRangeStart: null, dashRangeEnd: null, dashRangeAnchor: null, dashHoverDate: null,
+    dayRangeStart: null, dayRangeEnd: null, dayRangeAnchor: null, dayHoverDate: null,
+    showReportsPicker: false, reportsRangeStart: null, reportsRangeEnd: null, reportsRangeAnchor: null, reportsHoverDate: null,
+    showTradesPicker: false, tradesRangeStart: null, tradesRangeEnd: null, tradesRangeAnchor: null, tradesHoverDate: null,
+    tosState: 'expired', colorblindPalette: 'greenRed', displayTimezone: 'ET', csvFileName: null, csvImporting: false,
+    dashPickerMonth: null, tradesPickerMonth: null, reportsPickerMonth: null, dayPickerMonth: null,
+    acctHoverIdx: null, dashCalMonth: null,
+  };
+
+  async componentDidMount() {
+    const mod = await import('./trade-data.js');
+    this.dataMod = mod;
+    setTimeout(() => {
+      this.setState({ trades: mod.trades.map(t => ({ ...t })), loaded: true, selectedTradeId: mod.trades[0].id });
+    }, 350);
+  }
+
+  colors() {
+    const cb = this.state.colorblindPalette === 'blueOrange';
+    const base = this.state.theme === 'dark' ? {
+      bg:'#0a0e16', surface:'#12161f', surface2:'#171c28', surfaceHover:'#1b2130',
+      border:'#232937', borderStrong:'#323a4d', textPrimary:'#e7e9ee', textSecondary:'#aab1c0',
+      textMuted:'#6b7386', accent:'#8b5cf6', accentSoft:'rgba(139,92,246,0.16)',
+      win:'#22c55e', winSoft:'rgba(34,197,94,0.14)', loss:'#ef4444', lossSoft:'rgba(239,68,68,0.14)',
+      cardShadow:'none', chartUp:'#22c55e', chartDown:'#ef4444', chartVol:'#2b3244', chartGrid:'#1c2230',
+    } : {
+      bg:'#f7f5f0', surface:'#ffffff', surface2:'#fcfbf8', surfaceHover:'#f1efe8',
+      border:'#e4e0d6', borderStrong:'#d2ccbd', textPrimary:'#1c1d21', textSecondary:'#5b5f68',
+      textMuted:'#8b8e96', accent:'#7c3aed', accentSoft:'rgba(124,58,237,0.10)',
+      win:'#0f7a3d', winSoft:'rgba(15,122,61,0.10)', loss:'#c0271f', lossSoft:'rgba(192,39,31,0.10)',
+      cardShadow:'0 1px 2px rgba(20,20,10,0.05), 0 1px 0 rgba(20,20,10,0.04)', chartUp:'#0f7a3d', chartDown:'#c0271f', chartVol:'#dcd6c8', chartGrid:'#eae6db',
+    };
+    if (!cb) return base;
+    return this.state.theme === 'dark'
+      ? { ...base, win:'#3b82f6', winSoft:'rgba(59,130,246,0.16)', loss:'#f97316', lossSoft:'rgba(249,115,22,0.16)', chartUp:'#3b82f6', chartDown:'#f97316' }
+      : { ...base, win:'#1d4ed8', winSoft:'rgba(29,78,216,0.10)', loss:'#c2410c', lossSoft:'rgba(194,65,12,0.10)', chartUp:'#1d4ed8', chartDown:'#c2410c' };
+  }
+
+  money(n, plusSign) {
+    const sign = n < 0 ? '-' : (plusSign && n > 0 ? '+' : '');
+    return sign + '$' + Math.abs(n).toFixed(2);
+  }
+  moneyCompact(n) {
+    const sign = n < 0 ? '-' : n > 0 ? '+' : '';
+    const abs = Math.abs(n);
+    const num = abs >= 1000 ? (abs / 1000).toFixed(abs >= 10000 ? 0 : 1) + 'k' : abs.toFixed(0);
+    return sign + '$' + num;
+  }
+  pnlColor(n, c) { return n > 0 ? c.win : n < 0 ? c.loss : c.textMuted; }
+  dateShort(d) { const p = d.split('-'); const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return months[parseInt(p[1],10)-1] + ' ' + parseInt(p[2],10); }
+
+  setScreen(s) { this.setState({ screen: s, dayViewDate: null }); }
+  openTrade(id, from) { this.setState({ selectedTradeId: id, tradeFrom: from, screen: 'tradeDetail', chartTimeframe: '1m', noteTab: 'notes' }); }
+
+  addDuration(time, dur) {
+    const [h, m, s] = time.split(':').map(Number);
+    const mm = parseInt((dur.match(/(\d+)m/) || [0, 0])[1], 10);
+    const ss = parseInt((dur.match(/(\d+)s/) || [0, 0])[1], 10);
+    let total = h * 3600 + m * 60 + s + mm * 60 + ss;
+    const H = Math.floor(total / 3600) % 24, M = Math.floor((total % 3600) / 60), S = total % 60;
+    return [H, M, S].map(n => String(n).padStart(2, '0')).join(':');
+  }
+  cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  buildChart(trade, timeframe, c) {
+    const counts = { '1m': 56, '5m': 40, '15m': 26 };
+    const count = counts[timeframe] || 56;
+    const candles = this.dataMod.generateCandles(trade.entry, trade.exit, trade.id * 97 + count, count);
+    const allPrices = candles.flatMap(cd => [cd.high, cd.low]);
+    const min = Math.min(...allPrices, trade.target, trade.stop);
+    const max = Math.max(...allPrices, trade.target, trade.stop);
+    const pad = (max - min) * 0.1 || 0.05;
+    const lo = min - pad, hi = max + pad;
+    const H = 300;
+    const cwPct = 100 / count;
+    const toY = p => H - ((p - lo) / (hi - lo)) * H;
+    const bars = candles.map((cd, i) => {
+      const up = cd.close >= cd.open;
+      const color = up ? c.chartUp : c.chartDown;
+      const bodyTop = toY(Math.max(cd.open, cd.close));
+      const bodyBot = toY(Math.min(cd.open, cd.close));
+      const bodyH = Math.max(bodyBot - bodyTop, 1);
+      const wickTop = toY(cd.high), wickBot = toY(cd.low);
+      const leftPct = i * cwPct;
+      return {
+        wickStyle: `position:absolute;left:calc(${(leftPct + cwPct / 2).toFixed(2)}% - 0.5px);top:${wickTop.toFixed(1)}px;width:1px;height:${(wickBot - wickTop).toFixed(1)}px;background:${color};`,
+        bodyStyle: `position:absolute;left:${(leftPct + cwPct * 0.12).toFixed(2)}%;top:${bodyTop.toFixed(1)}px;width:${(cwPct * 0.76).toFixed(2)}%;height:${bodyH.toFixed(1)}px;background:${color};`,
+      };
+    });
+    const maxVol = Math.max(...candles.map(cd => cd.volume));
+    const volBars = candles.map((cd, i) => {
+      const up = cd.close >= cd.open;
+      const h = (cd.volume / maxVol) * 60;
+      const leftPct = i * cwPct;
+      return { style: `position:absolute;left:${(leftPct + cwPct * 0.12).toFixed(2)}%;bottom:0;width:${(cwPct * 0.76).toFixed(2)}%;height:${h.toFixed(1)}px;background:${up ? c.chartUp : c.chartDown};opacity:0.55;` };
+    });
+    const gridLines = [0, 0.25, 0.5, 0.75, 1].map(f => ({ style: `position:absolute;left:0;right:0;top:${(f * H).toFixed(1)}px;height:1px;background:${c.chartGrid};` }));
+    const targetY = toY(trade.target), stopY = toY(trade.stop), entryY = toY(trade.entry), exitY = toY(trade.exit);
+    const boxTop = Math.min(targetY, stopY), boxBottom = Math.max(targetY, stopY);
+    const riskTop = Math.min(entryY, stopY), riskBottom = Math.max(entryY, stopY);
+    const rewardTop = Math.min(entryY, targetY), rewardBottom = Math.max(entryY, targetY);
+    const riskZoneStyle = `position:absolute;left:0;right:0;top:${riskTop.toFixed(1)}px;height:${(riskBottom - riskTop).toFixed(1)}px;background:${c.lossSoft};z-index:0;`;
+    const rewardZoneStyle = `position:absolute;left:0;right:0;top:${rewardTop.toFixed(1)}px;height:${(rewardBottom - rewardTop).toFixed(1)}px;background:${c.winSoft};z-index:0;`;
+    const entryLineStyle = `position:absolute;left:0;right:0;top:${entryY.toFixed(1)}px;height:0;border-top:1px dashed ${c.textMuted};z-index:1;`;
+    const diagLeft = 8, diagRight = 92;
+    const diagStyle = `position:absolute;left:${diagLeft}%;top:${Math.min(entryY, exitY).toFixed(1)}px;width:${diagRight - diagLeft}%;height:${Math.abs(entryY - exitY).toFixed(1)}px;z-index:1;pointer-events:none;`;
+    const diagFromTop = entryY < exitY ? 0 : 100, diagToTop = entryY < exitY ? 100 : 0;
+    const diagLineGradient = `linear-gradient(to bottom right, transparent calc(50% - 1px), ${c.textMuted} 50%, transparent calc(50% + 1px))`;
+    const cornerSq = (top, left) => `position:absolute;left:${left}%;top:${top.toFixed(1)}px;width:8px;height:8px;margin:-4px;border:2px solid ${c.accent};background:${c.surface};border-radius:2px;z-index:2;`;
+    const corners = [cornerSq(boxTop, 0), cornerSq(boxTop, 100), cornerSq(boxBottom, 0), cornerSq(boxBottom, 100)];
+    const pill = (bg) => `position:absolute;right:10px;font-size:10.5px;font-weight:700;color:#fff;background:${bg};padding:5px 10px;border-radius:6px;white-space:nowrap;z-index:3;box-shadow:0 2px 6px rgba(0,0,0,0.25);`;
+    const targetPct = ((Math.abs(trade.target - trade.entry) / trade.entry) * 100).toFixed(2);
+    const stopPct = ((Math.abs(trade.stop - trade.entry) / trade.entry) * 100).toFixed(2);
+    const targetLabelStyle = pill(c.win) + `top:${(targetY - 15).toFixed(1)}px;`;
+    const stopLabelStyle = pill(c.loss) + `top:${(stopY - 15).toFixed(1)}px;`;
+    const targetPillText = 'Target: ' + trade.target.toFixed(2) + ' (' + targetPct + '%) · Qty ' + trade.qty;
+    const stopPillText = 'Stop: ' + trade.stop.toFixed(2) + ' (' + stopPct + '%) · Qty ' + trade.qty;
+    const rr = (Math.abs(trade.target - trade.entry) / (Math.abs(trade.entry - trade.stop) || 1)).toFixed(1);
+    const centerBg = trade.pnl >= 0 ? c.win : c.loss;
+    const centerLeftPct = ((Math.max(1, Math.min(count - 1, Math.round(count * 0.16))) + Math.max(1, Math.min(count - 1, Math.round(count * 0.74)))) / 2) * cwPct;
+    const centerPillStyle = `position:absolute;left:${centerLeftPct.toFixed(1)}%;transform:translateX(-50%);top:${(entryY - 15).toFixed(1)}px;font-size:10.5px;font-weight:700;color:#fff;background:${centerBg};padding:5px 10px;border-radius:6px;white-space:nowrap;z-index:4;box-shadow:0 2px 6px rgba(0,0,0,0.25);text-align:center;`;
+    const centerPillText = 'Closed P&L: ' + this.money(trade.pnl, true) + ' · Qty ' + trade.qty + ' · R/R ' + rr;
+    const badge = (top, leftPct, align) => `position:absolute;${align === 'right' ? 'right:2px' : 'left:' + leftPct.toFixed(1) + '%'};top:${top.toFixed(1)}px;width:18px;height:18px;border-radius:50%;background:${c.surface2};border:1.5px solid ${c.border};color:${c.textSecondary};font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:5;`;
+    const badges = [
+      { style: badge(entryY - 32, centerLeftPct, 'center'), label: '1' },
+      { style: badge(targetY - 32, 0, 'right'), label: '2' },
+      { style: badge(stopY - 32, 0, 'right'), label: '3' },
+    ];
+
+    const mkMarker = (idx, isEntry, fill) => {
+      const y = toY(fill.price);
+      const leftPct = idx * cwPct + cwPct / 2;
+      const color = isEntry ? c.chartUp : c.chartDown;
+      const dotTop = y - 5;
+      return {
+        dotStyle: `position:absolute;left:calc(${leftPct.toFixed(2)}% - 5px);top:${dotTop.toFixed(1)}px;width:10px;height:10px;border-radius:50%;background:${color};z-index:3;box-shadow:0 0 0 2px ${c.surface};`,
+        arrow: '',
+        labelStyle: `display:none;`,
+        text: '',
+      };
+    };
+    const markers = [];
+    const entryIdx = Math.round(count * 0.16), exitIdx = Math.round(count * 0.74);
+    if (trade.partials) {
+      trade.partials.entries.forEach((e, i) => markers.push(mkMarker(entryIdx + i * 2, true, e)));
+      trade.partials.exits.forEach((e, i) => markers.push(mkMarker(exitIdx + i * 2, false, e)));
+    } else {
+      markers.push(mkMarker(entryIdx, true, { time: trade.time, price: trade.entry, qty: trade.qty }));
+      markers.push(mkMarker(exitIdx, false, { time: this.addDuration(trade.time, trade.duration), price: trade.exit, qty: trade.qty }));
+    }
+    return {
+      bars, volBars, gridLines, targetLabelStyle, stopLabelStyle, markers,
+      riskZoneStyle, rewardZoneStyle, entryLineStyle, corners,
+      targetPillText, stopPillText, centerPillStyle, centerPillText, badges,
+    };
+  }
+
+  renderVals() {
+    const c = this.colors();
+    const trades = this.state.trades;
+    const loaded = this.state.loaded;
+
+    const navDefs = [
+      { id: 'dashboard', label: 'Dashboard', icon: '▦' },
+      { id: 'trades', label: 'Trades', icon: '☰' },
+      { id: 'journal', label: 'Daily Journal', icon: '✎' },
+      { id: 'reports', label: 'Reports', icon: '▤' },
+      { id: 'settings', label: 'Settings', icon: '⚙' },
+    ];
+    const navItems = navDefs.map(n => ({
+      ...n, onClick: () => this.setScreen(n.id),
+      style: '', // active styling handled via color below in template through label only; keep simple
+    })).map(n => ({ ...n, }));
+    // active highlight baked into label color via icon opacity — simpler: build style string per item
+    const navItemsStyled = navDefs.map(n => {
+      const active = this.state.screen === n.id;
+      return { id: n.id, label: n.label, icon: n.icon, onClick: () => this.setScreen(n.id) };
+    });
+
+    const deliverableItems = [
+      { id: 'components', label: 'Components', icon: '◫', onClick: () => this.setScreen('components') },
+      { id: 'tokens', label: 'Tokens', icon: '⌗', onClick: () => this.setScreen('tokens') },
+    ];
+
+    const skeletonKpis = [1,2,3,4,5,6];
+    const skeletonRows = new Array(10).fill(0);
+
+    if (!loaded) {
+      return { c, notLoaded: true, loaded: false, skeletonKpis, navItems: navItemsStyled, deliverableItems,
+        darkPillBg:c.accentSoft, darkPillColor:c.accent, lightPillBg:'transparent', lightPillColor:c.textMuted,
+        setThemeDark:()=>this.setState({theme:'dark'}), setThemeLight:()=>this.setState({theme:'light'}) };
+    }
+
+    const isDashboard = this.state.screen === 'dashboard';
+    const isTrades = this.state.screen === 'trades';
+    const isTradeDetail = this.state.screen === 'tradeDetail';
+    const isJournal = this.state.screen === 'journal';
+    const isReports = this.state.screen === 'reports';
+    const isSettings = this.state.screen === 'settings';
+    const isComponents = this.state.screen === 'components';
+    const isTokens = this.state.screen === 'tokens';
+
+    const fmtLocal = dt => dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+    const mondayOf = d => { const dt = new Date(d + 'T00:00:00'); const day = dt.getDay(); const diff = day === 0 ? -6 : 1 - day; dt.setDate(dt.getDate() + diff); return fmtLocal(dt); };
+    const fridayOf = d => { const dt = new Date(mondayOf(d) + 'T00:00:00'); dt.setDate(dt.getDate() + 4); return fmtLocal(dt); };
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const parseMonthKey = k => { const [y, m] = k.split('-').map(Number); return { y, m: m - 1 }; };
+    const shiftMonthKey = (k, delta) => { const { y, m } = parseMonthKey(k); const d = new Date(y, m + delta, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
+    const allDates = [...new Set(trades.map(t => t.date))].sort();
+    const defaultWeekStart = allDates.length ? mondayOf(allDates[allDates.length - 1]) : mondayOf(fmtLocal(new Date()));
+    const dashWeekStart = this.state.dashRangeStart || defaultWeekStart;
+    const weekEnd = this.state.dashRangeEnd || fridayOf(dashWeekStart);
+    const weekStartDt = new Date(dashWeekStart + 'T00:00:00');
+    const dashTrades = trades.filter(t => t.date >= dashWeekStart && t.date <= weekEnd);
+    const fmtDay = d => { const dt = new Date(d + 'T00:00:00'); return (dt.getMonth() + 1) + '/' + dt.getDate(); };
+    const dashWeekLabel = fmtDay(dashWeekStart) + ' – ' + fmtDay(weekEnd);
+    const dashPickerMonthKey = this.state.dashPickerMonth || (weekStartDt.getFullYear() + '-' + String(weekStartDt.getMonth() + 1).padStart(2, '0'));
+    const dashPickerMonthParts = parseMonthKey(dashPickerMonthKey);
+    const dashPickerMonthLabel = monthNames[dashPickerMonthParts.m] + ' ' + dashPickerMonthParts.y;
+    const dashCal = this.dataMod.buildCalendar(trades, dashPickerMonthParts.y, dashPickerMonthParts.m);
+    const dashPrevMonth = () => this.setState({ dashPickerMonth: shiftMonthKey(dashPickerMonthKey, -1) });
+    const dashNextMonth = () => this.setState({ dashPickerMonth: shiftMonthKey(dashPickerMonthKey, 1) });
+    const dashAnchor = this.state.dashRangeAnchor;
+    const dashHover = this.state.dashHoverDate || dashAnchor;
+    const dashPreviewStart = dashAnchor ? (dashAnchor < dashHover ? dashAnchor : dashHover) : dashWeekStart;
+    const dashPreviewEnd = dashAnchor ? (dashAnchor < dashHover ? dashHover : dashAnchor) : weekEnd;
+    const onDashCellClick = date => {
+      if (!this.state.dashRangeAnchor) { this.setState({ dashRangeAnchor: date, dashHoverDate: date }); }
+      else {
+        const a = this.state.dashRangeAnchor;
+        const start = a < date ? a : date, end = a < date ? date : a;
+        this.setState({ dashRangeStart: start, dashRangeEnd: end, dashRangeAnchor: null, dashHoverDate: null, showDashPicker: false });
+      }
+    };
+    const onDashCellHover = date => { if (this.state.dashRangeAnchor) this.setState({ dashHoverDate: date }); };
+    const dashPickerWeeks = dashCal.weeks.map(week => week.map(cell => {
+      if (!cell) return { bg: 'transparent', dayNum: '', cursor: 'default', onClick: () => {}, onHover: () => {}, ring: 'none' };
+      const inRange = cell.date >= dashPreviewStart && cell.date <= dashPreviewEnd;
+      const bg = cell.empty ? c.surface2 : cell.pnl > 0 ? c.win : cell.pnl < 0 ? c.loss : c.borderStrong;
+      return {
+        bg, dayNum: cell.day, cursor: 'pointer',
+        onClick: () => onDashCellClick(cell.date), onHover: () => onDashCellHover(cell.date),
+        ring: inRange ? '2px solid ' + c.accent : '2px solid transparent',
+      };
+    }));
+    const toggleDashPicker = () => this.setState(s => ({ showDashPicker: !s.showDashPicker, dashRangeAnchor: null, dashHoverDate: null }));
+
+    const kpis = this.dataMod.computeKpis(dashTrades);
+    const avgWinDisplay = this.money(kpis.avgWin, true);
+    const avgLossDisplay = this.money(kpis.avgLoss, false);
+
+    const grossWin = dashTrades.filter(t => t.pnl > 0).reduce((s, t) => s + t.pnl, 0);
+    const grossLoss = Math.abs(dashTrades.filter(t => t.pnl < 0).reduce((s, t) => s + t.pnl, 0));
+    const pfShare = (grossWin + grossLoss) ? (grossWin / (grossWin + grossLoss)) * 100 : 50;
+    const pfCirc = 2 * Math.PI * 24;
+
+    const beCount = dashTrades.filter(t => t.pnl === 0).length;
+    const wTot = Math.max(kpis.winCount + beCount + kpis.lossCount, 1);
+    const winFrac = kpis.winCount / wTot, beFrac = beCount / wTot, lossFrac = kpis.lossCount / wTot;
+    const arcPt = (deg, r) => { const rad = deg * Math.PI / 180; return [(60 + r * Math.cos(rad)).toFixed(1), (60 - r * Math.sin(rad)).toFixed(1)]; };
+    const mkArc = (a1, a2, r) => { const [x1, y1] = arcPt(a1, r), [x2, y2] = arcPt(a2, r); return `M${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2}`; };
+    const aWinEnd = 180 - winFrac * 180, aBeEnd = aWinEnd - beFrac * 180, aLossEnd = aBeEnd - lossFrac * 180;
+    const winRatePath = mkArc(180, aWinEnd, 44), beRatePath = mkArc(aWinEnd, aBeEnd, 44), lossRatePath = mkArc(aBeEnd, Math.max(aLossEnd, 0), 44);
+
+    const winLossRatio = Math.abs(kpis.avgLoss) ? (kpis.avgWin / Math.abs(kpis.avgLoss)) : kpis.avgWin > 0 ? 99 : 0;
+    const wlShare = (kpis.avgWin + Math.abs(kpis.avgLoss)) ? (kpis.avgWin / (kpis.avgWin + Math.abs(kpis.avgLoss))) * 100 : 50;
+
+    const startingBalance = 10000;
+    const balanceSortedTrades = [...trades].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    const balanceSeries = [startingBalance, ...(() => { let c2 = startingBalance; return balanceSortedTrades.map(t => (c2 += t.pnl)); })()];
+    const balanceDates = [balanceSortedTrades[0] ? balanceSortedTrades[0].date : null, ...balanceSortedTrades.map(t => t.date)];
+    const bMin = Math.min(...balanceSeries), bMax = Math.max(...balanceSeries);
+    const bRange = (bMax - bMin) || 1;
+    const sparkW = 90, sparkH = 34;
+    const sparkStepX = sparkW / Math.max(balanceSeries.length - 1, 1);
+    const sparkY = v => sparkH - ((v - bMin) / bRange) * (sparkH - 4) - 2;
+    const sparkPoints = balanceSeries.map((v, i) => (i * sparkStepX).toFixed(1) + ',' + sparkY(v).toFixed(1)).join(' ');
+    const sparkArea = '0,' + sparkH + ' ' + sparkPoints + ' ' + sparkW + ',' + sparkH;
+    const accountBalance = balanceSeries[balanceSeries.length - 1];
+    const acctHoverIdx = this.state.acctHoverIdx;
+    const acctHovering = acctHoverIdx != null && acctHoverIdx >= 0 && acctHoverIdx < balanceSeries.length;
+    const acctHoverX = acctHovering ? (acctHoverIdx * sparkStepX).toFixed(1) : null;
+    const acctHoverY = acctHovering ? sparkY(balanceSeries[acctHoverIdx]).toFixed(1) : null;
+    const acctHoverValueText = acctHovering ? '$' + balanceSeries[acctHoverIdx].toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : null;
+    const acctHoverDateText = acctHovering ? (balanceDates[acctHoverIdx] ? this.dateShort(balanceDates[acctHoverIdx]) : 'Start') : null;
+    const onAcctMouseMove = e => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+      const idx = Math.round(frac * (balanceSeries.length - 1));
+      if (idx !== this.state.acctHoverIdx) this.setState({ acctHoverIdx: idx });
+    };
+    const onAcctMouseLeave = () => this.setState({ acctHoverIdx: null });
+
+    const accountBalanceText = '$' + accountBalance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+    const beforeWeekPnl = trades.filter(t => t.date < dashWeekStart).reduce((s, t) => s + t.pnl, 0);
+    const weekStartBalance = startingBalance + beforeWeekPnl;
+    const weekPnlSum = dashTrades.reduce((s, t) => s + t.pnl, 0);
+    const weekEndBalance = weekStartBalance + weekPnlSum;
+    const weekPct = weekStartBalance ? (weekPnlSum / weekStartBalance) * 100 : 0;
+    const weekPctText = (weekPct >= 0 ? '+' : '') + weekPct.toFixed(2) + '%';
+    const weekPctColor = weekPct >= 0 ? c.win : c.loss;
+    const acctHoverPct = acctHovering && weekStartBalance ? ((balanceSeries[acctHoverIdx] - weekStartBalance) / weekStartBalance) * 100 : null;
+    const acctHoverPctText = acctHovering ? (acctHoverPct >= 0 ? '+' : '') + acctHoverPct.toFixed(2) + '%' : null;
+    const acctHoverPctColor = acctHovering ? (acctHoverPct >= 0 ? c.win : c.loss) : null;
+    const acctDisplayText = acctHovering ? acctHoverValueText : accountBalanceText;
+    const acctDisplaySub = acctHovering ? acctHoverPctText : weekPctText;
+    const acctDisplaySubColor = acctHovering ? acctHoverPctColor : weekPctColor;
+
+    const kpiCards = [
+      { label: 'Profit Factor', value: kpis.profitFactor.toFixed(2), kind: 'ring', ringDash: pfCirc.toFixed(1), ringOffset: (pfCirc * (1 - pfShare / 100)).toFixed(1) },
+      { label: 'Trade Win %', value: kpis.winRate.toFixed(1) + '%', kind: 'halfgauge',
+        gaugeSegments: [{ path: winRatePath, color: c.win }, { path: beRatePath, color: '#3b82f6' }, { path: lossRatePath, color: c.loss }],
+        gaugeCounts: [{ n: kpis.winCount, color: c.win }, { n: beCount, color: '#3b82f6' }, { n: kpis.lossCount, color: c.loss }] },
+      { label: 'Avg Win / Loss', value: winLossRatio.toFixed(2), kind: 'bar', winPct: wlShare.toFixed(1) + '%', lossPct: (100 - wlShare).toFixed(1) + '%', avgWinText: avgWinDisplay, avgLossText: avgLossDisplay },
+      { label: 'Trade Expectancy', value: this.money(kpis.expectancy, true), color: this.pnlColor(kpis.expectancy, c), sub: 'per trade', kind: 'plain' },
+    ];
+
+    const rSortedTrades = [...trades].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    const rSeries = rSortedTrades.map(t => t.r);
+    const avgR = rSeries.length ? rSeries.reduce((s, v) => s + v, 0) / rSeries.length : 0;
+    const rMin = Math.min(...rSeries, 0), rMax = Math.max(...rSeries, 0), rRg = (rMax - rMin) || 1;
+    const rStepX = 90 / Math.max(rSeries.length - 1, 1);
+    const rSparkPoints = rSeries.map((v, i) => (i * rStepX).toFixed(1) + ',' + (34 - ((v - rMin) / rRg) * 30 - 2).toFixed(1)).join(' ');
+    const rSparkArea = '0,34 ' + rSparkPoints + ' 90,34';
+    const rColorAvg = avgR >= 0 ? c.win : c.loss;
+    kpiCards.push({ label: 'Average R', value: avgR.toFixed(2) + 'R', color: rColorAvg, kind: 'sparkline', sparkPoints: rSparkPoints, sparkArea: rSparkArea, sparkColor: rColorAvg, sparkW: 90, sparkH: 34 });
+
+    const dashCalMonthKey = this.state.dashCalMonth || '2026-07';
+    const dashCalMonthParts = parseMonthKey(dashCalMonthKey);
+    const dashCalMonthLabel = monthNames[dashCalMonthParts.m] + ' ' + dashCalMonthParts.y;
+    const cal = this.dataMod.buildCalendar(trades, dashCalMonthParts.y, dashCalMonthParts.m);
+    const dashCalMonthStartStr = dashCalMonthParts.y + '-' + String(dashCalMonthParts.m + 1).padStart(2, '0') + '-01';
+    const dashCalMonthPnl = cal.weekTotals.reduce((s, v) => s + v, 0);
+    const dashCalMonthStartBalance = 10000 + trades.filter(t => t.date < dashCalMonthStartStr).reduce((s, t) => s + t.pnl, 0);
+    const dashCalMonthPct = dashCalMonthStartBalance ? (dashCalMonthPnl / dashCalMonthStartBalance) * 100 : 0;
+    const dashCalMonthPctText = (dashCalMonthPct >= 0 ? '+' : '') + dashCalMonthPct.toFixed(2) + '%';
+    const dashCalMonthPctColor = dashCalMonthPct >= 0 ? c.win : c.loss;
+    const dashCalPrevMonth = () => this.setState({ dashCalMonth: shiftMonthKey(dashCalMonthKey, -1) });
+    const dashCalNextMonth = () => this.setState({ dashCalMonth: shiftMonthKey(dashCalMonthKey, 1) });
+    const calendarWeeks = cal.weeks.map((week, wi) => ({
+      totalText: this.moneyCompact(cal.weekTotals[wi]), totalColor: this.pnlColor(cal.weekTotals[wi], c),
+      weekBorder: c.accent,
+      weekLabel: 'W' + (wi + 1),
+      cells: week.map(cell => {
+        if (!cell) return { bg: 'transparent', border: 'transparent', dayNum: '', pnlText: '', pnlColor: c.textMuted, metaText: '', cursor: 'default', onClick: () => {}, hoverStyle: '' };
+        if (cell.empty) return { bg: c.surface2, border: c.border, dayNum: cell.day, pnlText: '', pnlColor: c.textMuted, metaText: '', cursor: 'default', onClick: () => {}, hoverStyle: '' };
+        const win = cell.pnl > 0;
+        return {
+          bg: win ? c.winSoft : cell.pnl < 0 ? c.lossSoft : c.surface2,
+          border: win ? c.win : cell.pnl < 0 ? c.loss : c.border,
+          dayNum: cell.day, pnlText: this.moneyCompact(cell.pnl), pnlColor: this.pnlColor(cell.pnl, c),
+          metaText: cell.count + 't · ' + cell.r.toFixed(1) + 'R',
+          cursor: 'pointer', onClick: () => this.setState({ dayViewDate: cell.date }), hoverStyle: 'filter:brightness(1.08);',
+        };
+      }),
+    }));
+
+    const dayViewDate = this.state.dayViewDate;
+    const hasDayView = !!dayViewDate;
+    const dayViewTrades = hasDayView ? trades.filter(t => t.date === dayViewDate).map(t => ({
+      symbol: t.symbol, time: t.time, pnlText: this.money(t.pnl, true), pnlColor: this.pnlColor(t.pnl, c),
+      onClick: () => this.openTrade(t.id, 'dashboard'),
+    })) : [];
+    const dayViewLabel = hasDayView ? this.dateShort(dayViewDate) + ' · ' + dayViewTrades.length + ' trade' + (dayViewTrades.length > 1 ? 's' : '') : '';
+    const dayViewMaxHeight = hasDayView ? '400px' : '0px';
+    const dayViewOpacity = hasDayView ? 1 : 0;
+    const dayViewMarginTop = hasDayView ? '12px' : '0px';
+
+    const sortedByDate = [...trades].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    let cum = 0;
+    const eqVals = sortedByDate.map(t => (cum += t.pnl));
+    const equityEnd = eqVals[eqVals.length - 1] || 0;
+
+    const dayMap = {};
+    trades.forEach(t => { dayMap[t.date] = (dayMap[t.date] || 0) + t.pnl; });
+    const dayDates = Object.keys(dayMap).sort();
+    const dayVals = dayDates.map(d => dayMap[d]);
+    const dayAbsMax = Math.max(...dayVals.map(v => Math.abs(v)), 100);
+    const chartW = 560, chartH = 210, baseY = chartH / 2;
+    const barSlot = chartW / dayVals.length;
+    const barW = Math.max(barSlot * 0.55, 6);
+    const dayBars = dayDates.map((d, i) => {
+      const v = dayMap[d];
+      const h = (Math.abs(v) / dayAbsMax) * (chartH / 2 - 10);
+      const x = i * barSlot + (barSlot - barW) / 2;
+      return { x: x.toFixed(1), y: (v >= 0 ? baseY - h : baseY).toFixed(1), w: barW.toFixed(1), h: h.toFixed(1), color: v >= 0 ? c.win : c.loss, label: this.dateShort(d), valText: this.money(v, true) };
+    });
+    const eqTicks = [0, 0.25, 0.5, 0.75, 1].map(f => {
+      const val = dayAbsMax - f * dayAbsMax * 2;
+      return { y: (f * chartH).toFixed(1), label: (val >= 0 ? '$' : '-$') + Math.abs(Math.round(val)).toLocaleString() };
+    });
+    const xIdxD = [0, Math.floor((dayDates.length - 1) * 0.4), Math.floor((dayDates.length - 1) * 0.7), dayDates.length - 1];
+    const eqXLabels = [...new Set(xIdxD)].map(i => ({ x: (((i * barSlot) + barSlot / 2) / chartW * 100).toFixed(1) + '%', label: this.dateShort(dayDates[i]) }));
+
+    const recentTrades = [...dashTrades].sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)).slice(0, 8).map(t => ({
+      dateShort: this.dateShort(t.date), symbol: t.symbol, sideLabel: t.side.toUpperCase(), sideColor: t.side === 'long' ? c.win : c.loss,
+      qty: t.qty, pnlText: this.money(t.pnl, true), pnlColor: this.pnlColor(t.pnl, c),
+      rText: t.r.toFixed(1) + 'R', rColor: this.pnlColor(t.r, c),
+      statusText: t.status === 'cancelled' ? 'Cancelled' : t.status === 'closed' ? 'Filled' : 'Working',
+      statusDotColor: t.status === 'cancelled' ? c.loss : t.status === 'closed' ? c.win : '#f59e0b',
+      onClick: () => this.openTrade(t.id, 'dashboard'),
+    }));
+
+    const mkToggle = (screenKey, viewKey) => ['data', 'loading', 'empty'].map(v => ({
+      label: v.charAt(0).toUpperCase() + v.slice(1),
+      onClick: () => this.setState({ [viewKey]: v }),
+      bg: this.state[viewKey] === v ? c.accentSoft : 'transparent',
+      color: this.state[viewKey] === v ? c.accent : c.textMuted,
+    }));
+    const stateToggles = { dashboard: mkToggle('dashboard', 'dashboardView'), trades: mkToggle('trades', 'tradesView') };
+
+    const tradesRangeStart = this.state.tradesRangeStart || mondayOf(defaultWeekStart);
+    const tradesRangeEnd = this.state.tradesRangeEnd || fridayOf(tradesRangeStart);
+    const tradesRangeLabel = fmtDay(tradesRangeStart) + ' – ' + fmtDay(tradesRangeEnd);
+    const trStartDt = new Date(tradesRangeStart + 'T00:00:00');
+    const tradesPickerMonthKey = this.state.tradesPickerMonth || (trStartDt.getFullYear() + '-' + String(trStartDt.getMonth() + 1).padStart(2, '0'));
+    const tradesPickerMonthParts = parseMonthKey(tradesPickerMonthKey);
+    const tradesPickerMonthLabel = monthNames[tradesPickerMonthParts.m] + ' ' + tradesPickerMonthParts.y;
+    const trCal = this.dataMod.buildCalendar(trades, tradesPickerMonthParts.y, tradesPickerMonthParts.m);
+    const tradesPrevMonth = () => this.setState({ tradesPickerMonth: shiftMonthKey(tradesPickerMonthKey, -1) });
+    const tradesNextMonth = () => this.setState({ tradesPickerMonth: shiftMonthKey(tradesPickerMonthKey, 1) });
+    const trAnchor = this.state.tradesRangeAnchor;
+    const trHover = this.state.tradesHoverDate || trAnchor;
+    const trPreviewStart = trAnchor ? (trAnchor < trHover ? trAnchor : trHover) : tradesRangeStart;
+    const trPreviewEnd = trAnchor ? (trAnchor < trHover ? trHover : trAnchor) : tradesRangeEnd;
+    const onTrCellClick = date => {
+      if (!this.state.tradesRangeAnchor) { this.setState({ tradesRangeAnchor: date, tradesHoverDate: date }); }
+      else {
+        const a = this.state.tradesRangeAnchor;
+        const start = a < date ? a : date, end = a < date ? date : a;
+        this.setState({ tradesRangeStart: start, tradesRangeEnd: end, tradesRangeAnchor: null, tradesHoverDate: null, showTradesPicker: false });
+      }
+    };
+    const onTrCellHover = date => { if (this.state.tradesRangeAnchor) this.setState({ tradesHoverDate: date }); };
+    const tradesPickerWeeks = trCal.weeks.map(week => week.map(cell => {
+      if (!cell) return { bg: 'transparent', dayNum: '', cursor: 'default', onClick: () => {}, onHover: () => {}, ring: 'none' };
+      const inRange = cell.date >= trPreviewStart && cell.date <= trPreviewEnd;
+      return {
+        bg: cell.empty ? c.surface2 : cell.pnl > 0 ? c.win : cell.pnl < 0 ? c.loss : c.borderStrong, dayNum: cell.day, cursor: 'pointer',
+        onClick: () => onTrCellClick(cell.date), onHover: () => onTrCellHover(cell.date),
+        ring: inRange ? '2px solid ' + c.accent : '2px solid transparent',
+      };
+    }));
+    const toggleTradesPicker = () => this.setState(s => ({ showTradesPicker: !s.showTradesPicker, tradesRangeAnchor: null, tradesHoverDate: null }));
+
+    let filtTrades = trades.filter(t => t.date >= tradesRangeStart && t.date <= tradesRangeEnd);
+    const sk = this.state.tradesSortKey, sd = this.state.tradesSortDir;
+    filtTrades = [...filtTrades].sort((a, b) => {
+      let av = sk === 'pnl' ? a.pnl : (a.date + a.time);
+      let bv = sk === 'pnl' ? b.pnl : (b.date + b.time);
+      const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+      return sd === 'asc' ? cmp : -cmp;
+    });
+    const tradesRows = filtTrades.map(t => ({
+      dateShort: this.dateShort(t.date), time: t.time, symbol: t.symbol, sideLabel: t.side === 'long' ? 'L' : 'S', sideColor: t.side === 'long' ? c.win : c.loss,
+      qty: t.qty, entryText: t.entry.toFixed(2), exitText: t.exit.toFixed(2), pnlText: this.money(t.pnl, true), pnlColor: this.pnlColor(t.pnl, c),
+      rText: t.r.toFixed(1) + 'R', rColor: this.pnlColor(t.r, c), duration: t.duration,
+      status: t.status === 'closed' ? 'Filled' : 'Working', noteDot: t.hasNote ? '●' : '○', noteColor: t.hasNote ? c.accent : c.textMuted,
+      statusDotColor: t.status === 'cancelled' ? c.loss : t.status === 'closed' ? c.win : '#f59e0b',
+      rowBg: this.state.selectedTradeId === t.id ? c.accentSoft : 'transparent',
+      onClick: () => this.openTrade(t.id, 'trades'), _date: t.date, _pnl: t.pnl,
+    }));
+    const spanDays = (new Date(tradesRangeEnd + 'T00:00:00') - new Date(tradesRangeStart + 'T00:00:00')) / 86400000 + 1;
+    const groupKeyFn = spanDays <= 1 ? null : spanDays <= 7 ? (d => d) : spanDays <= 31 ? mondayOf : (d => d.slice(0, 7));
+    const groupLabelFn = spanDays <= 7 ? (k => this.dateShort(k)) : spanDays <= 31 ? (k => 'Week of ' + this.dateShort(k)) : (k => { const [y, m] = k.split('-'); return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m - 1] + ' ' + y; });
+    let tradesGroups = null;
+    if (groupKeyFn) {
+      const order = [], map = {};
+      tradesRows.forEach(r => { const k = groupKeyFn(r._date); if (!map[k]) { map[k] = []; order.push(k); } map[k].push(r); });
+      tradesGroups = order.map(k => {
+        const rows = map[k];
+        const total = rows.reduce((s, r) => s + r._pnl, 0);
+        return { key: k, label: groupLabelFn(k), totalText: this.money(total, true), totalColor: this.pnlColor(total, c), rows };
+      });
+    }
+
+    // ---- Trade Detail ----
+    const st = trades.find(t => t.id === this.state.selectedTradeId) || trades[0];
+    const sortedIdx = sortedByDate.findIndex(t => t.id === st.id);
+    const prevT = sortedByDate[sortedIdx - 1], nextT = sortedByDate[sortedIdx + 1];
+    const commission = +(st.qty * 0.0035).toFixed(2);
+    const gross = st.pnl + commission;
+    const fromMap = { dashboard: 'Dashboard', trades: 'Trades', journal: 'Daily Journal' };
+    const chartInfo = this.buildChart(st, this.state.chartTimeframe, c);
+    const exitTime = st.duration ? this.addDuration(st.time, st.duration) : st.time;
+    const executions = st.partials
+      ? [...st.partials.entries.map(e => ({ time: e.time, price: e.price.toFixed(2), qty: e.qty, side: st.side === 'long' ? 'BUY' : 'SHORT', color: c.win })),
+         ...st.partials.exits.map(e => ({ time: e.time, price: e.price.toFixed(2), qty: e.qty, side: st.side === 'long' ? 'SELL' : 'COVER', color: c.loss }))]
+      : [
+          { time: st.time, price: st.entry.toFixed(2), qty: st.qty, side: st.side === 'long' ? 'BUY' : 'SHORT', color: c.win },
+          { time: exitTime, price: st.exit.toFixed(2), qty: st.qty, side: st.side === 'long' ? 'SELL' : 'COVER', color: c.loss },
+        ];
+    const defaultNotes = {
+      1: 'Clean gap and go on SOFI, took the first 1m pullback after the open drive. Sized full and trailed the stop up — exited into resistance from the prior day high.',
+      4: 'Chased this one without a real catalyst, just saw volume spike. Should have waited for a first pullback confirmation. Stopped out fast, no argument with the loss.',
+      5: 'BBIG short on the flush after the morning top. Waited for the break of VWAP before adding. Covered into the flush low, good discipline on this one.',
+      8: 'TELL bull flag with two adds on the way up. Scaled out in two pieces near the daily high. Best execution of the week so far.',
+      11: 'SNDL gap and go, textbook. In within the first 90 seconds of confirmation, out on the first sign of stalling near round-number resistance.',
+    };
+    const noteText = this.state.notesByTradeId[st.id] !== undefined ? this.state.notesByTradeId[st.id] : (defaultNotes[st.id] || '');
+
+    const dtRangeStart = this.state.dayRangeStart || mondayOf(defaultWeekStart);
+    const dtRangeEnd = this.state.dayRangeEnd || fridayOf(dtRangeStart);
+    const dayTrades = trades.filter(t => t.date >= dtRangeStart && t.date <= dtRangeEnd).sort((a, b) => a.time.localeCompare(b.time)).map(t => {
+      const candles = this.dataMod.generateCandles(t.entry, t.exit, t.id * 13, 16);
+      const closes = candles.map(cd => cd.close);
+      const mn = Math.min(...closes), mx = Math.max(...closes), rg = (mx - mn) || 1;
+      const stepX = 40 / (closes.length - 1);
+      const sparkPoints = closes.map((v, i) => (i * stepX).toFixed(1) + ',' + (16 - ((v - mn) / rg) * 16 + 1).toFixed(1)).join(' ');
+      const sparkArea = '0,18 ' + sparkPoints + ' 40,18';
+      const stockColor = t.exit >= t.entry ? c.win : c.loss;
+      return {
+        symbol: t.symbol, sparkPoints, sparkArea, stockColor,
+        pnlText: this.money(t.pnl, true), pnlColor: this.pnlColor(t.pnl, c), time: t.time,
+        borderColor: t.id === st.id ? c.accent : c.border,
+        onClick: () => this.openTrade(t.id, this.state.tradeFrom),
+      };
+    });
+    const dayRangeLabel = fmtDay(dtRangeStart) + ' – ' + fmtDay(dtRangeEnd);
+    const dtStartDt = new Date(dtRangeStart + 'T00:00:00');
+    const dayPickerMonthKey = this.state.dayPickerMonth || (dtStartDt.getFullYear() + '-' + String(dtStartDt.getMonth() + 1).padStart(2, '0'));
+    const dayPickerMonthParts = parseMonthKey(dayPickerMonthKey);
+    const dayPickerMonthLabel = monthNames[dayPickerMonthParts.m] + ' ' + dayPickerMonthParts.y;
+    const dayCal = this.dataMod.buildCalendar(trades, dayPickerMonthParts.y, dayPickerMonthParts.m);
+    const dayPrevMonth = () => this.setState({ dayPickerMonth: shiftMonthKey(dayPickerMonthKey, -1) });
+    const dayNextMonth = () => this.setState({ dayPickerMonth: shiftMonthKey(dayPickerMonthKey, 1) });
+    const dtAnchor = this.state.dayRangeAnchor;
+    const dtHover = this.state.dayHoverDate || dtAnchor;
+    const dtPreviewStart = dtAnchor ? (dtAnchor < dtHover ? dtAnchor : dtHover) : dtRangeStart;
+    const dtPreviewEnd = dtAnchor ? (dtAnchor < dtHover ? dtHover : dtAnchor) : dtRangeEnd;
+    const onDayCellClick = date => {
+      if (!this.state.dayRangeAnchor) { this.setState({ dayRangeAnchor: date, dayHoverDate: date }); }
+      else {
+        const a = this.state.dayRangeAnchor;
+        const start = a < date ? a : date, end = a < date ? date : a;
+        this.setState({ dayRangeStart: start, dayRangeEnd: end, dayRangeAnchor: null, dayHoverDate: null, showDayPicker: false });
+      }
+    };
+    const onDayCellHover = date => { if (this.state.dayRangeAnchor) this.setState({ dayHoverDate: date }); };
+    const pickerWeeks = dayCal.weeks.map(week => week.map(cell => {
+      if (!cell) return { bg: 'transparent', dayNum: '', cursor: 'default', onClick: () => {}, onHover: () => {}, ring: 'none' };
+      const inRange = cell.date >= dtPreviewStart && cell.date <= dtPreviewEnd;
+      return {
+        bg: cell.empty ? c.surface2 : cell.pnl > 0 ? c.win : cell.pnl < 0 ? c.loss : c.borderStrong, dayNum: cell.day, cursor: 'pointer',
+        onClick: () => onDayCellClick(cell.date), onHover: () => onDayCellHover(cell.date),
+        ring: inRange ? '2px solid ' + c.accent : '2px solid transparent',
+      };
+    }));
+    const toggleDayPicker = () => this.setState(s => ({ showDayPicker: !s.showDayPicker, dayRangeAnchor: null, dayHoverDate: null }));
+
+    const stateToggles2 = { ...stateToggles, chart: mkToggle('chart', 'chartView') };
+    const timeframes = ['1m', '5m', '15m'].map(tf => ({
+      label: tf, onClick: () => this.setState({ chartTimeframe: tf }),
+      bg: this.state.chartTimeframe === tf ? c.accent : c.surface2, color: this.state.chartTimeframe === tf ? '#fff' : c.textSecondary,
+    }));
+    const noteTabDefs = [{ id: 'notes', label: 'Notes' }, { id: 'executions', label: 'Executions' }, { id: 'attachments', label: 'Attachments' }];
+    const noteTabs = noteTabDefs.map(t => ({
+      label: t.label, onClick: () => this.setState({ noteTab: t.id }),
+      color: this.state.noteTab === t.id ? c.textPrimary : c.textMuted,
+      borderColor: this.state.noteTab === t.id ? c.accent : 'transparent',
+    }));
+    const autosaveMap = {
+      saved: { dot: '●', color: c.win, label: 'Saved' },
+      saving: { dot: '◐', color: c.accent, label: 'Saving…' },
+      unsaved: { dot: '●', color: '#eab308', label: 'Unsaved changes' },
+    }[this.state.autosaveStatus];
+
+    const td = {
+      symbol: st.symbol, dateFull: this.dateShort(st.date) + ', 2026', time: st.time,
+      sideLabel: st.side.toUpperCase(), sideColor: st.side === 'long' ? c.win : c.loss, sideBg: st.side === 'long' ? c.winSoft : c.lossSoft,
+      netText: this.money(st.pnl, true), netColor: this.pnlColor(st.pnl, c), qty: st.qty,
+      grossText: this.money(gross, true), grossColor: this.pnlColor(gross, c),
+      stars: '★'.repeat(st.rating) + '☆'.repeat(5 - st.rating),
+      maeText: st.mae.toFixed(2), mfeText: '+' + st.mfe.toFixed(2),
+      plannedR: st.r >= 0 ? (Math.abs(st.r) + 1).toFixed(1) + 'R' : '2.0R', realizedR: st.r.toFixed(1) + 'R',
+      targetText: '$' + st.target.toFixed(2), stopText: '$' + st.stop.toFixed(2),
+      mistakeChips: st.mistakes.map(this.cap), habitChips: st.habits.map(this.cap),
+      noMistakes: st.mistakes.length === 0, noHabits: st.habits.length === 0,
+      lastEdited: st.hasNote ? 'Today · 11:42 AM' : '—', executions,
+    };
+
+    // ---- Daily Journal ----
+    const uniqueDates = [...new Set(trades.map(t => t.date))].sort();
+    const jDate = this.state.journalDate || uniqueDates[uniqueDates.length - 1];
+    const jTrades = trades.filter(t => t.date === jDate);
+    const jKpis = this.dataMod.computeKpis(jTrades);
+    const journalDay = {
+      pnlText: this.money(jKpis.netPnl, true), pnlColor: this.pnlColor(jKpis.netPnl, c),
+      count: jTrades.length, winRate: jKpis.winRate.toFixed(0) + '%',
+      trades: jTrades.map(t => {
+        const candles = this.dataMod.generateCandles(t.entry, t.exit, t.id * 13, 16);
+        const closes = candles.map(cd => cd.close);
+        const mn = Math.min(...closes), mx = Math.max(...closes), rg = (mx - mn) || 1;
+        const stepX = 40 / (closes.length - 1);
+        const sparkPoints = closes.map((v, i) => (i * stepX).toFixed(1) + ',' + (16 - ((v - mn) / rg) * 16 + 1).toFixed(1)).join(' ');
+        const sparkArea = '0,18 ' + sparkPoints + ' 40,18';
+        const stockColor = t.exit >= t.entry ? c.win : c.loss;
+        return {
+          symbol: t.symbol, sparkPoints, sparkArea, stockColor,
+          pnlText: this.money(t.pnl, true), pnlColor: this.pnlColor(t.pnl, c), time: t.time,
+          onClick: () => this.openTrade(t.id, 'journal'),
+        };
+      }),
+    };
+    const journalDateLabel = this.dateShort(jDate) + ', 2026';
+    const jCal = this.dataMod.buildCalendar(trades, new Date(jDate + 'T00:00:00').getFullYear(), new Date(jDate + 'T00:00:00').getMonth());
+    const journalPickerWeeks = jCal.weeks.map(week => week.map(cell => {
+      if (!cell) return { bg: 'transparent', dayNum: '', cursor: 'default', onClick: () => {}, ring: 'none' };
+      if (cell.empty) return { bg: c.surface2, dayNum: cell.day, cursor: 'default', onClick: () => {}, ring: 'none' };
+      return {
+        bg: cell.pnl > 0 ? c.win : cell.pnl < 0 ? c.loss : c.borderStrong, dayNum: cell.day, cursor: 'pointer',
+        onClick: () => this.setState({ journalDate: cell.date, showJournalPicker: false }),
+        ring: cell.date === jDate ? '2px solid ' + c.accent : '2px solid transparent',
+      };
+    }));
+    const toggleJournalPicker = () => this.setState(s => ({ showJournalPicker: !s.showJournalPicker }));
+
+    // ---- Reports ----
+    const reportsRangeStart = this.state.reportsRangeStart || mondayOf(defaultWeekStart);
+    const reportsRangeEnd = this.state.reportsRangeEnd || fridayOf(reportsRangeStart);
+    const reportsTrades = trades.filter(t => t.date >= reportsRangeStart && t.date <= reportsRangeEnd);
+    const reportsRangeLabel = fmtDay(reportsRangeStart) + ' – ' + fmtDay(reportsRangeEnd);
+    const repStartDt = new Date(reportsRangeStart + 'T00:00:00');
+    const reportsPickerMonthKey = this.state.reportsPickerMonth || (repStartDt.getFullYear() + '-' + String(repStartDt.getMonth() + 1).padStart(2, '0'));
+    const reportsPickerMonthParts = parseMonthKey(reportsPickerMonthKey);
+    const reportsPickerMonthLabel = monthNames[reportsPickerMonthParts.m] + ' ' + reportsPickerMonthParts.y;
+    const repCal = this.dataMod.buildCalendar(trades, reportsPickerMonthParts.y, reportsPickerMonthParts.m);
+    const reportsPrevMonth = () => this.setState({ reportsPickerMonth: shiftMonthKey(reportsPickerMonthKey, -1) });
+    const reportsNextMonth = () => this.setState({ reportsPickerMonth: shiftMonthKey(reportsPickerMonthKey, 1) });
+    const repAnchor = this.state.reportsRangeAnchor;
+    const repHover = this.state.reportsHoverDate || repAnchor;
+    const repPreviewStart = repAnchor ? (repAnchor < repHover ? repAnchor : repHover) : reportsRangeStart;
+    const repPreviewEnd = repAnchor ? (repAnchor < repHover ? repHover : repAnchor) : reportsRangeEnd;
+    const onRepCellClick = date => {
+      if (!this.state.reportsRangeAnchor) { this.setState({ reportsRangeAnchor: date, reportsHoverDate: date }); }
+      else {
+        const a = this.state.reportsRangeAnchor;
+        const start = a < date ? a : date, end = a < date ? date : a;
+        this.setState({ reportsRangeStart: start, reportsRangeEnd: end, reportsRangeAnchor: null, reportsHoverDate: null, showReportsPicker: false });
+      }
+    };
+    const onRepCellHover = date => { if (this.state.reportsRangeAnchor) this.setState({ reportsHoverDate: date }); };
+    const reportsPickerWeeks = repCal.weeks.map(week => week.map(cell => {
+      if (!cell) return { bg: 'transparent', dayNum: '', cursor: 'default', onClick: () => {}, onHover: () => {}, ring: 'none' };
+      const inRange = cell.date >= repPreviewStart && cell.date <= repPreviewEnd;
+      return {
+        bg: cell.empty ? c.surface2 : cell.pnl > 0 ? c.win : cell.pnl < 0 ? c.loss : c.borderStrong, dayNum: cell.day, cursor: 'pointer',
+        onClick: () => onRepCellClick(cell.date), onHover: () => onRepCellHover(cell.date),
+        ring: inRange ? '2px solid ' + c.accent : '2px solid transparent',
+      };
+    }));
+    const toggleReportsPicker = () => this.setState(s => ({ showReportsPicker: !s.showReportsPicker, reportsRangeAnchor: null, reportsHoverDate: null }));
+
+    const groupWinRate = (list, keyFn, labels) => {
+      const buckets = {};
+      list.forEach(t => { const k = keyFn(t); (buckets[k] = buckets[k] || []).push(t); });
+      return labels.map(([key, label]) => {
+        const arr = buckets[key] || [];
+        const wr = arr.length ? (arr.filter(t => t.pnl > 0).length / arr.length) * 100 : 0;
+        return { label, pct: wr.toFixed(0) + '%', pctText: wr.toFixed(0) + '%', color: wr >= 50 ? c.win : c.loss };
+      });
+    };
+    const timeBucket = t => { const h = parseInt(t.time.slice(0, 2), 10), m = parseInt(t.time.slice(3, 5), 10); const mins = h * 60 + m; if (mins < 600) return '930'; if (mins < 630) return '1000'; if (mins < 660) return '1030'; return '1100'; };
+    const byTime = groupWinRate(reportsTrades, timeBucket, [['930', '9:30–10:00'], ['1000', '10:00–10:30'], ['1030', '10:30–11:00'], ['1100', '11:00–11:30']]);
+    const dowBucket = t => new Date(t.date + 'T00:00:00').getDay();
+    const byDow = groupWinRate(reportsTrades, dowBucket, [[1, 'Monday'], [2, 'Tuesday'], [3, 'Wednesday'], [4, 'Thursday'], [5, 'Friday']]);
+    const priceBuckets = [[0, 2, '$0–2'], [2, 5, '$2–5'], [5, 10, '$5–10'], [10, 20, '$10–20'], [20, Infinity, '$20+']];
+    const bucketShares = priceBuckets.map(([lo, hi]) => reportsTrades.filter(t => { const p = (t.entry + t.exit) / 2; return p >= lo && p < hi; }).reduce((s, t) => s + t.qty, 0));
+    const maxShares = Math.max(...bucketShares, 1);
+    const byAvgPrice = priceBuckets.map(([lo, hi, label], i) => ({
+      label, pct: ((bucketShares[i] / maxShares) * 100).toFixed(0) + '%', pctText: bucketShares[i].toLocaleString() + ' sh', color: c.accent,
+    }));
+    const rVals = reportsTrades.map(t => t.r);
+    const rAvgAll = rVals.length ? rVals.reduce((s, v) => s + v, 0) / rVals.length : 0;
+    const rWins = rVals.filter(v => v > 0), rLosses = rVals.filter(v => v < 0);
+    const rAvgWin = rWins.length ? rWins.reduce((s, v) => s + v, 0) / rWins.length : 0;
+    const rAvgLoss = rLosses.length ? rLosses.reduce((s, v) => s + v, 0) / rLosses.length : 0;
+    const rBest = rVals.length ? Math.max(...rVals) : 0;
+    const rWorst = rVals.length ? Math.min(...rVals) : 0;
+    const rStats = [
+      { label: 'Avg R', value: rAvgAll.toFixed(2) + 'R', color: this.pnlColor(rAvgAll, c) },
+      { label: 'Avg Winning R', value: '+' + rAvgWin.toFixed(2) + 'R', color: c.win },
+      { label: 'Avg Losing R', value: rAvgLoss.toFixed(2) + 'R', color: c.loss },
+      { label: 'Best R', value: (rBest >= 0 ? '+' : '') + rBest.toFixed(2) + 'R', color: c.win },
+      { label: 'Worst R', value: rWorst.toFixed(2) + 'R', color: c.loss },
+    ];
+    const rDayMap = {};
+    reportsTrades.forEach(t => { (rDayMap[t.date] = rDayMap[t.date] || []).push(t.r); });
+    const rDayDates = Object.keys(rDayMap).sort();
+    const rDayAvgs = rDayDates.map(d => rDayMap[d].reduce((s, v) => s + v, 0) / rDayMap[d].length);
+    const rDayMaxAbs = Math.max(...rDayAvgs.map(v => Math.abs(v)), 0.1);
+    const rHistogram = rDayDates.map((d, i) => ({
+      label: this.dateShort(d), count: rDayAvgs[i].toFixed(2) + 'R',
+      barHeight: ((Math.abs(rDayAvgs[i]) / rDayMaxAbs) * 100).toFixed(0) + '%',
+      color: rDayAvgs[i] < 0 ? c.loss : c.win,
+    }));
+    const rtSorted = [...reportsTrades].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    const rtCount = rtSorted.length || 1;
+    const rtTotalPnl = reportsTrades.reduce((s, t) => s + t.pnl, 0);
+    const rtWins = reportsTrades.filter(t => t.pnl > 0.5), rtLosses = reportsTrades.filter(t => t.pnl < -0.5), rtScratch = reportsTrades.filter(t => Math.abs(t.pnl) <= 0.5);
+    const rtLargestGain = rtWins.length ? Math.max(...rtWins.map(t => t.pnl)) : 0;
+    const rtLargestLoss = rtLosses.length ? Math.min(...rtLosses.map(t => t.pnl)) : 0;
+    const rtDays = new Set(reportsTrades.map(t => t.date)).size || 1;
+    const rtTotalShares = reportsTrades.reduce((s, t) => s + t.qty, 0) || 1;
+    const rtAvgWinTrade = rtWins.length ? rtWins.reduce((s, t) => s + t.pnl, 0) / rtWins.length : 0;
+    const rtAvgLossTrade = rtLosses.length ? rtLosses.reduce((s, t) => s + t.pnl, 0) / rtLosses.length : 0;
+    const parseMin = d => { const m = (d || '').match(/(\d+)m/); return m ? +m[1] : 0; };
+    const avgMin = arr => arr.length ? (arr.reduce((s, t) => s + parseMin(t.duration), 0) / arr.length) : 0;
+    let curWinStreak = 0, curLossStreak = 0, maxWinStreak = 0, maxLossStreak = 0;
+    rtSorted.forEach(t => {
+      if (t.pnl > 0) { curWinStreak++; curLossStreak = 0; } else if (t.pnl < 0) { curLossStreak++; curWinStreak = 0; } else { curWinStreak = 0; curLossStreak = 0; }
+      maxWinStreak = Math.max(maxWinStreak, curWinStreak); maxLossStreak = Math.max(maxLossStreak, curLossStreak);
+    });
+    const rtMeanPnl = rtTotalPnl / rtCount;
+    const rtVariance = reportsTrades.reduce((s, t) => s + Math.pow(t.pnl - rtMeanPnl, 2), 0) / rtCount;
+    const rtStdDev = Math.sqrt(rtVariance);
+    const rtSQN = rtStdDev ? (rtMeanPnl / rtStdDev) * Math.sqrt(rtCount) : 0;
+    const normCdf = z => 1 - 0.5 * Math.exp(-0.717 * z - 0.416 * z * z);
+    const rtProbRandom = Math.max(0, Math.min(100, (1 - normCdf(Math.max(rtSQN, 0))) * 100));
+    const rtWinRateFrac = rtWins.length / rtCount;
+    const rtWLRatio = rtAvgLossTrade ? Math.abs(rtAvgWinTrade / rtAvgLossTrade) : 0;
+    const rtKelly = rtWLRatio ? (rtWinRateFrac - (1 - rtWinRateFrac) / rtWLRatio) * 100 : 0;
+    let rtCum = 0; const eqSeries = rtSorted.map(t => (rtCum += t.pnl));
+    const nEq = eqSeries.length;
+    let kRatio = 0;
+    if (nEq > 1) {
+      const xMean = (nEq - 1) / 2, yMean = eqSeries.reduce((s, v) => s + v, 0) / nEq;
+      let sxy = 0, sxx = 0;
+      eqSeries.forEach((y, i) => { sxy += (i - xMean) * (y - yMean); sxx += (i - xMean) * (i - xMean); });
+      const slope = sxx ? sxy / sxx : 0;
+      const resid = eqSeries.map((y, i) => y - (yMean + slope * (i - xMean)));
+      const stderr = Math.sqrt(resid.reduce((s, r) => s + r * r, 0) / (nEq - 2 || 1)) / (Math.sqrt(sxx) || 1);
+      kRatio = stderr ? slope / stderr / 100 : 0;
+    }
+    const rtProfitFactor = (() => { const gw = rtWins.reduce((s, t) => s + t.pnl, 0), gl = Math.abs(rtLosses.reduce((s, t) => s + t.pnl, 0)); return gl ? gw / gl : gw > 0 ? 99 : 0; })();
+    const rtCommissions = reportsTrades.reduce((s, t) => s + t.qty * 0.0035, 0);
+    const rtFees = rtCommissions * 7.9;
+    const rtAvgMae = reportsTrades.length ? reportsTrades.reduce((s, t) => s + (t.mae || 0), 0) / reportsTrades.length : 0;
+    const rtAvgMfe = reportsTrades.length ? reportsTrades.reduce((s, t) => s + (t.mfe || 0), 0) / reportsTrades.length : 0;
+    const mny = v => this.money(v, true);
+    const statRows = [
+      [{ label: 'Total Gain/Loss', value: mny(rtTotalPnl), color: this.pnlColor(rtTotalPnl, c) }, { label: 'Largest Gain', value: mny(rtLargestGain), color: c.win }, { label: 'Largest Loss', value: mny(rtLargestLoss), color: c.loss }],
+      [{ label: 'Average Daily Gain/Loss', value: mny(rtTotalPnl / rtDays), color: this.pnlColor(rtTotalPnl / rtDays, c) }, { label: 'Average Daily Volume', value: Math.round(rtTotalShares / rtDays).toLocaleString() }, { label: 'Average Per-share Gain/Loss', value: '$' + (rtTotalPnl / rtTotalShares).toFixed(2) }],
+      [{ label: 'Average Trade Gain/Loss', value: mny(rtMeanPnl), color: this.pnlColor(rtMeanPnl, c) }, { label: 'Average Winning Trade', value: mny(rtAvgWinTrade), color: c.win }, { label: 'Average Losing Trade', value: mny(rtAvgLossTrade), color: c.loss }],
+      [{ label: 'Total Number of Trades', value: String(reportsTrades.length) }, { label: 'Number of Winning Trades', value: rtWins.length + ' (' + (rtWins.length / rtCount * 100).toFixed(1) + '%)' }, { label: 'Number of Losing Trades', value: rtLosses.length + ' (' + (rtLosses.length / rtCount * 100).toFixed(1) + '%)' }],
+      [{ label: 'Average Hold Time (scratch trades)', value: Math.round(avgMin(rtScratch)) + ' minutes' }, { label: 'Average Hold Time (winning trades)', value: Math.round(avgMin(rtWins)) + ' minutes' }, { label: 'Average Hold Time (losing trades)', value: Math.round(avgMin(rtLosses)) + ' minutes' }],
+      [{ label: 'Number of Scratch Trades', value: String(rtScratch.length) }, { label: 'Max Consecutive Wins', value: String(maxWinStreak) }, { label: 'Max Consecutive Losses', value: String(maxLossStreak) }],
+      [{ label: 'Trade P&L Standard Deviation', value: mny(rtStdDev) }, { label: 'System Quality Number (SQN)', value: rtSQN.toFixed(2) }, { label: 'Probability of Random Chance', value: rtProbRandom.toFixed(1) + '%' }],
+      [{ label: 'Kelly Percentage', value: rtKelly.toFixed(1) + '%' }, { label: 'K-Ratio', value: kRatio.toFixed(2) }, { label: 'Profit factor', value: rtProfitFactor.toFixed(2) }],
+      [{ label: 'Total Commissions', value: mny(rtCommissions) }, { label: 'Total Fees', value: mny(rtFees) }],
+      [{ label: 'Average position MAE', value: mny(-Math.abs(rtAvgMae)), color: c.loss }, { label: 'Average Position MFE', value: mny(Math.abs(rtAvgMfe)), color: c.win }],
+    ];
+    const reports = { byTime, byDow, byAvgPrice, rStats, rHistogram, reportsRangeLabel, reportsPickerWeeks, toggleReportsPicker, showReportsPicker: this.state.showReportsPicker, statRows, reportsPickerMonthLabel, reportsPrevMonth, reportsNextMonth };
+
+    const stateToggles3 = { ...stateToggles2, journal: mkToggle('journal', 'journalView'), reports: mkToggle('reports', 'reportsView') };
+
+    // ---- Settings ----
+    const tosState = this.state.tosState;
+    const tosBadge = tosState === 'expired' ? 'EXPIRED' : tosState === 'expiring' ? 'EXPIRING SOON' : 'CONNECTED';
+    const tosBadgeColor = tosState === 'expired' ? c.loss : tosState === 'expiring' ? '#f59e0b' : c.win;
+    const tosBadgeBg = tosState === 'expired' ? 'rgba(239,68,68,0.14)' : tosState === 'expiring' ? 'rgba(245,158,11,0.14)' : c.winSoft;
+    const tosCardBorder = tosState === 'expired' ? c.loss : c.border;
+    const tosCardBg = tosState === 'expired' ? 'rgba(239,68,68,0.06)' : c.surface;
+    const tosMessage = tosState === 'expired'
+      ? "thinkorswim refresh tokens last exactly 7 days and can't be renewed automatically — this one expired 2 days ago. Reconnect to resume the nightly sync."
+      : tosState === 'expiring'
+      ? "thinkorswim refresh tokens last exactly 7 days and can't be renewed automatically — this one expires in 18 hours. Reconnect soon to avoid a gap in sync."
+      : "thinkorswim refresh tokens last exactly 7 days and can't be renewed automatically — we'll remind you before this one expires.";
+    const tosLastLinked = 'Jul 14, 09:02:11 ET · Jul 14, 05:02:11 local';
+    const tosExpiredLabel = tosState === 'active' ? 'EXPIRES' : 'EXPIRED';
+    const tosExpiredValue = tosState === 'active' ? 'Jul 28, 09:02:11 ET · Jul 28, 05:02:11 local' : 'Jul 21, 09:02:11 ET · Jul 21, 05:02:11 local';
+    const tosLastSynced = 'Jul 21, 04:00:02 ET · Jul 21, 00:00:02 local';
+    const tosReauth = () => this.setState({ tosState: 'active' });
+    const csvOnSelect = e => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      this.setState({ csvFileName: f.name, csvImporting: true });
+      setTimeout(() => this.setState({ csvImporting: false }), 1400);
+    };
+    const timezoneOptions = ['Eastern (ET)', 'Central (CT)', 'Mountain (MT)', 'Pacific (PT)'];
+    const cycleTimezone = () => {
+      const idx = timezoneOptions.indexOf(this.state.displayTimezone === 'ET' ? 'Eastern (ET)' : this.state.displayTimezone);
+      const map = ['ET', 'CT', 'MT', 'PT'];
+      this.setState({ displayTimezone: map[(map.indexOf(this.state.displayTimezone) + 1) % map.length] });
+    };
+    const displayTimezoneLabel = { ET: 'Eastern (ET)', CT: 'Central (CT)', MT: 'Mountain (MT)', PT: 'Pacific (PT)' }[this.state.displayTimezone] || 'Eastern (ET)';
+    const settingsAccounts = [
+      { name: 'thinkorswim — Individual', mask: '••••4821' },
+      { name: 'thinkorswim — Margin', mask: '••••7734' },
+    ];
+    const setPaletteGreenRed = () => this.setState({ colorblindPalette: 'greenRed' });
+    const setPaletteBlueOrange = () => this.setState({ colorblindPalette: 'blueOrange' });
+    const isGreenRed = this.state.colorblindPalette !== 'blueOrange';
+    const paletteGreenBg = isGreenRed ? c.accentSoft : 'transparent', paletteGreenColor = isGreenRed ? c.accent : c.textMuted;
+    const paletteBlueBg = !isGreenRed ? c.accentSoft : 'transparent', paletteBlueColor = !isGreenRed ? c.accent : c.textMuted;
+
+    return {
+      c, notLoaded: false, loaded: true,
+      navItems: navItemsStyled, deliverableItems,
+      darkPillBg: this.state.theme === 'dark' ? c.accentSoft : 'transparent', darkPillColor: this.state.theme === 'dark' ? c.accent : c.textMuted,
+      lightPillBg: this.state.theme === 'light' ? c.accentSoft : 'transparent', lightPillColor: this.state.theme === 'light' ? c.accent : c.textMuted,
+      setThemeDark: () => this.setState({ theme: 'dark' }), setThemeLight: () => this.setState({ theme: 'light' }),
+      isDashboard, isTrades, isTradeDetail, isJournal, isReports, isComponents, isTokens,
+      dashLoading: this.state.dashboardView === 'loading', dashEmpty: this.state.dashboardView === 'empty', dashData: this.state.dashboardView === 'data',
+      dashWeekLabel, dashPickerWeeks, toggleDashPicker, showDashPicker: this.state.showDashPicker,
+      dashPickerMonthLabel, dashPrevMonth, dashNextMonth,
+      tradesLoading: this.state.tradesView === 'loading', tradesEmpty: this.state.tradesView === 'empty', tradesData: this.state.tradesView === 'data',
+      skeletonKpis, skeletonRows, stateToggles,
+      kpiCards, calendarWeeks, hasDayView, dayViewLabel, dayViewTrades, dayViewMaxHeight, dayViewOpacity, dayViewMarginTop,
+      dashCalMonthLabel, dashCalPrevMonth, dashCalNextMonth, dashCalMonthPctText, dashCalMonthPctColor,
+      accountBalanceText, acctSparkPoints: sparkPoints, acctSparkArea: sparkArea, acctSparkW: sparkW, acctSparkH: sparkH,
+      weekPctText, weekPctColor,
+      acctDisplayText, acctDisplaySub, acctDisplaySubColor,
+      acctHovering, acctHoverX, acctHoverY, onAcctMouseMove, onAcctMouseLeave,
+      equityEndText: this.money(equityEnd, true), equityEndColor: this.pnlColor(equityEnd, c),
+      eqTicks, eqXLabels, eqChartW: chartW, eqChartH: chartH, dayBars, baseY: baseY.toFixed(1),
+      recentTrades,
+      tradesRows, tradesGroups, hasTradesGroups: !!tradesGroups, noTradesGroups: !tradesGroups,
+      tradesRangeLabel, tradesPickerWeeks, toggleTradesPicker, showTradesPicker: this.state.showTradesPicker,
+      tradesPickerMonthLabel, tradesPrevMonth, tradesNextMonth,
+      sortByDate: () => this.setState({ tradesSortKey: 'date', tradesSortDir: this.state.tradesSortKey === 'date' && this.state.tradesSortDir === 'desc' ? 'asc' : 'desc' }),
+      sortByPnl: () => this.setState({ tradesSortKey: 'pnl', tradesSortDir: this.state.tradesSortKey === 'pnl' && this.state.tradesSortDir === 'desc' ? 'asc' : 'desc' }),
+      dateSortArrow: sk === 'date' ? (sd === 'desc' ? ' ↓' : ' ↑') : '', pnlSortArrow: sk === 'pnl' ? (sd === 'desc' ? ' ↓' : ' ↑') : '',
+      td, fromLabel: fromMap[this.state.tradeFrom] || 'Dashboard',
+      backToFrom: () => this.setState({ screen: fromMap[this.state.tradeFrom] ? this.state.tradeFrom : 'dashboard' }),
+      prevTradeFn: () => prevT && this.openTrade(prevT.id, this.state.tradeFrom),
+      nextTradeFn: () => nextT && this.openTrade(nextT.id, this.state.tradeFrom),
+      prevOpacity: prevT ? '1' : '0.35', nextOpacity: nextT ? '1' : '0.35',
+      stateToggles: stateToggles2, timeframes, noteTabs,
+      chartLoading: this.state.chartView === 'loading', chartEmpty: this.state.chartView === 'empty', chartData: this.state.chartView === 'data',
+      chart: chartInfo,
+      isNotesTab: this.state.noteTab === 'notes', isExecutionsTab: this.state.noteTab === 'executions', isAttachmentsTab: this.state.noteTab === 'attachments',
+      noteText,
+      onNoteChange: (e) => {
+        const val = e.target.value;
+        this.setState(prev => ({ notesByTradeId: { ...prev.notesByTradeId, [st.id]: val }, autosaveStatus: 'unsaved' }));
+        clearTimeout(this._saveTimer);
+        this._saveTimer = setTimeout(() => {
+          this.setState({ autosaveStatus: 'saving' });
+          setTimeout(() => this.setState({ autosaveStatus: 'saved' }), 700);
+        }, 600);
+      },
+      autosaveDot: autosaveMap.dot, autosaveColor: autosaveMap.color, autosaveLabel: autosaveMap.label,
+      dayTrades, dayRangeLabel, pickerWeeks, toggleDayPicker, showDayPicker: this.state.showDayPicker,
+      dayPickerMonthLabel, dayPrevMonth, dayNextMonth,
+      stateToggles: stateToggles3,
+      journalLoading: this.state.journalView === 'loading', journalEmpty: this.state.journalView === 'empty' || jTrades.length === 0, journalData: this.state.journalView === 'data' && jTrades.length > 0,
+      journalDateLabel, journalDay, journalPickerWeeks, toggleJournalPicker, showJournalPicker: this.state.showJournalPicker,
+      journalPrevDay: () => { const dt = new Date(jDate + 'T00:00:00'); dt.setDate(dt.getDate() - 1); this.setState({ journalDate: fmtLocal(dt) }); },
+      journalNextDay: () => { const dt = new Date(jDate + 'T00:00:00'); dt.setDate(dt.getDate() + 1); this.setState({ journalDate: fmtLocal(dt) }); },
+      reportsLoading: this.state.reportsView === 'loading', reportsEmpty: this.state.reportsView === 'empty', reportsData: this.state.reportsView === 'data',
+      reports,
+      isSettings,
+      tosState, tosBadge, tosBadgeColor, tosBadgeBg, tosCardBorder, tosCardBg, tosMessage,
+      tosLastLinked, tosExpiredLabel, tosExpiredValue, tosLastSynced, tosReauth,
+      tosSyncNow: () => this.setState({ tosState: 'active' }),
+      tosDisconnect: () => this.setState({ tosState: 'expired' }),
+      csvFileName: this.state.csvFileName, csvImporting: this.state.csvImporting, csvOnSelect,
+      settingsAccounts, displayTimezoneLabel, cycleTimezone,
+      isGreenRed, setPaletteGreenRed, setPaletteBlueOrange,
+      paletteGreenBg, paletteGreenColor, paletteBlueBg, paletteBlueColor,
+      tokenRows: [
+        { name: '--bg', dark: '#0a0e16', light: '#f7f5f0' },
+        { name: '--surface', dark: '#12161f', light: '#ffffff' },
+        { name: '--surface-2', dark: '#171c28', light: '#fcfbf8' },
+        { name: '--border', dark: '#232937', light: '#e4e0d6' },
+        { name: '--text-primary', dark: '#e7e9ee', light: '#1c1d21' },
+        { name: '--text-secondary', dark: '#aab1c0', light: '#5b5f68' },
+        { name: '--text-muted', dark: '#6b7386', light: '#8b8e96' },
+        { name: '--accent', dark: '#8b5cf6', light: '#7c3aed' },
+        { name: '--win', dark: '#22c55e', light: '#0f7a3d' },
+        { name: '--loss', dark: '#ef4444', light: '#c0271f' },
+        { name: '--chart-up', dark: '#22c55e', light: '#0f7a3d' },
+        { name: '--chart-down', dark: '#ef4444', light: '#c0271f' },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>
