@@ -10,7 +10,7 @@ export function StartingBalanceCard({ startingBalance }: { startingBalance: numb
 
   return (
     <div className="bg-surface border border-border rounded-[10px] px-5 py-[18px] mb-4">
-      <div className="text-[15px] font-bold mb-2.5">Starting balance</div>
+      <div className="text-[18px] font-bold mb-2.5">Starting balance</div>
       <div className="text-[12.5px] text-text-muted mb-3.5">
         {startingBalance === null
           ? "Not set yet -- import a CSV statement to auto-estimate it, or enter it directly."

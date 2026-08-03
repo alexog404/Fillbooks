@@ -157,7 +157,7 @@ export function TradeDetailClient({
           </div>
 
           <div className="bg-surface border border-border rounded-[10px] p-4">
-            <div className="text-[11px] font-bold mb-2.5">Risk levels</div>
+            <div className="text-[14px] font-bold mb-2.5">Risk levels</div>
             <div className="flex gap-2 mb-2">
               <div className="flex-1">
                 <div className="text-[10.5px] text-text-muted mb-1">Target</div>

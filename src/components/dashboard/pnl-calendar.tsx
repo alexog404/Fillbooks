@@ -29,7 +29,7 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
           >
             ‹
           </button>
-          <div className="text-[13px] font-bold">{monthLabel(monthKey)}</div>
+          <div className="text-[16px] font-bold">{monthLabel(monthKey)}</div>
           <button
             type="button"
             onClick={() => setMonthKey(shiftMonthKey(monthKey, 1))}

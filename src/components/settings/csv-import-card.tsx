@@ -10,7 +10,7 @@ export function CsvImportCard({ schwabConnected }: { schwabConnected: boolean })
 
   return (
     <div className="bg-surface border border-border rounded-[10px] px-5 py-[18px] mb-4">
-      <div className="text-[15px] font-bold mb-2.5">Import trades</div>
+      <div className="text-[18px] font-bold mb-2.5">Import trades</div>
       <div className="text-[12.5px] text-text-muted mb-3.5">
         Upload a thinkorswim/Schwab statement export (CSV) to backfill trade history.
       </div>

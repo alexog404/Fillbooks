@@ -107,7 +107,7 @@ export function TradesTable({ trades }: { trades: Trade[] }) {
   return (
     <div className="px-7 pt-6 pb-10">
       <div className="flex items-center justify-between mb-3.5">
-        <div className="text-[19px] font-bold">Trades</div>
+        <div className="text-[22px] font-bold">Trades</div>
         <div className="flex items-center gap-2">
           <div className="relative">
             <button

@@ -33,7 +33,7 @@ export function ChipsEditor({
 
   return (
     <div className="mb-3">
-      <div className="text-[11px] font-bold mb-1.5" style={{ color }}>{label}</div>
+      <div className="text-[14px] font-bold mb-1.5" style={{ color }}>{label}</div>
       <div className="flex flex-wrap gap-1.5 mb-2">
         {chips.map((chip) => (
           <div

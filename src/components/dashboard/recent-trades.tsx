@@ -10,7 +10,7 @@ export function RecentTrades({ trades }: { trades: Trade[] }) {
 
   return (
     <div className="bg-surface border border-border rounded-[10px] min-w-0">
-      <div className="px-[18px] py-3.5 border-b border-border text-[13px] font-bold">Recent Trades</div>
+      <div className="px-[18px] py-3.5 border-b border-border text-[16px] font-bold">Recent Trades</div>
       <div className={`grid ${cols} gap-1 px-[9px] py-2 text-[9px] text-text-muted uppercase tracking-[0.02em]`}>
         <div>Date</div><div>Sym</div><div className="text-right">Qty</div><div className="text-right">P&L</div><div className="text-right">R</div><div>Status</div>
       </div>

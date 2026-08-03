@@ -33,7 +33,7 @@ export function BrokerConnectionCard({ connection, state }: { connection: Broker
         <span className="text-[10.5px] font-extrabold tracking-[0.04em] px-2.5 py-1 rounded-md" style={{ color: badge.color, background: badge.bg }}>
           {badge.text}
         </span>
-        <div className="text-base font-bold">Schwab connection</div>
+        <div className="text-[19px] font-bold">Schwab connection</div>
       </div>
       <div className="text-[12.5px] text-text-secondary leading-[1.55] max-w-[640px] mb-4">{MESSAGE[state]}</div>
 

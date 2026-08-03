@@ -152,7 +152,7 @@ export function TradeChart({ bars, executions, target, stop }: TradeChartProps) 
     <div className="rounded-[10px] border border-border bg-surface p-3.5">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2.5">
-          <span className="text-[13px] font-bold">Session chart</span>
+          <span className="text-[16px] font-bold">Session chart</span>
           <div className="flex gap-0.5 rounded-lg border border-border p-0.5">
             {([1, 5, 15] as const).map((tf) => (
               <button

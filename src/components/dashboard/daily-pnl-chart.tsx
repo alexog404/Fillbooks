@@ -15,7 +15,7 @@ export function DailyPnlChart({ trades }: { trades: Trade[] }) {
   if (dayDates.length === 0) {
     return (
       <div className="bg-surface border border-border rounded-[10px] px-[18px] py-4">
-        <div className="text-[13px] font-bold mb-2">Daily P&amp;L — Win vs Loss Days</div>
+        <div className="text-[16px] font-bold mb-2">Daily P&amp;L — Win vs Loss Days</div>
         <div className="h-[210px] flex items-center justify-center text-sm text-text-muted">No trades yet.</div>
       </div>
     );
@@ -42,7 +42,7 @@ export function DailyPnlChart({ trades }: { trades: Trade[] }) {
   return (
     <div className="bg-surface border border-border rounded-[10px] px-[18px] py-4">
       <div className="flex items-center justify-between mb-2.5">
-        <div className="text-[13px] font-bold">Daily P&amp;L — Win vs Loss Days</div>
+        <div className="text-[16px] font-bold">Daily P&amp;L — Win vs Loss Days</div>
         <div className="text-xs font-bold font-mono" style={{ color: pnlColorVar(equityEnd) }}>{money(equityEnd, true)}</div>
       </div>
       <div className="flex">

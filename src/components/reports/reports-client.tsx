@@ -90,7 +90,7 @@ export function ReportsClient({ trades }: { trades: Trade[] }) {
       ) : (
         <>
           <div className="bg-surface border border-border rounded-[10px] mb-3.5 overflow-hidden">
-            <div className="text-[15px] font-bold px-4.5 py-3.5">Stats</div>
+            <div className="text-[18px] font-bold px-4.5 py-3.5">Stats</div>
             {statRows.map((row, i) => (
               <div key={i} className="grid grid-cols-3 border-t border-border">
                 {row.map((cell, j) => (
@@ -105,13 +105,13 @@ export function ReportsClient({ trades }: { trades: Trade[] }) {
 
           <div className="grid grid-cols-2 gap-3.5 mb-3.5">
             <div className="bg-surface border border-border rounded-[10px] p-4">
-              <div className="text-[12.5px] font-bold mb-3">Win Rate by Time of Day</div>
+              <div className="text-[15.5px] font-bold mb-3">Win Rate by Time of Day</div>
               {byTime.map((b) => (
                 <BarRow key={b.label} label={b.label} pct={b.pct} pctText={b.pct.toFixed(0) + "%"} color={b.color} />
               ))}
             </div>
             <div className="bg-surface border border-border rounded-[10px] p-4">
-              <div className="text-[12.5px] font-bold mb-3">Win Rate by Day of Week</div>
+              <div className="text-[15.5px] font-bold mb-3">Win Rate by Day of Week</div>
               {byDow.map((b) => (
                 <BarRow key={b.label} label={b.label} pct={b.pct} pctText={b.pct.toFixed(0) + "%"} color={b.color} />
               ))}
@@ -119,7 +119,7 @@ export function ReportsClient({ trades }: { trades: Trade[] }) {
           </div>
 
           <div className="bg-surface border border-border rounded-[10px] p-4 mb-3.5">
-            <div className="text-[12.5px] font-bold mb-3.5">R-Multiple Analysis</div>
+            <div className="text-[15.5px] font-bold mb-3.5">R-Multiple Analysis</div>
             {rStats === null || rHistogram === null ? (
               <div className="text-xs text-text-muted py-4 text-center">
                 No R-multiples set yet — add a target/stop on a Trade Detail page to see this.
@@ -151,7 +151,7 @@ export function ReportsClient({ trades }: { trades: Trade[] }) {
           </div>
 
           <div className="bg-surface border border-border rounded-[10px] p-4">
-            <div className="text-[12.5px] font-bold mb-3">Average Price of Stocks Traded</div>
+            <div className="text-[15.5px] font-bold mb-3">Average Price of Stocks Traded</div>
             {byPrice.map((b) => (
               <div key={b.label} className="flex items-center gap-2.5 mb-2.5">
                 <div className="w-[60px] text-[11.5px] text-text-secondary font-mono font-bold">{b.label}</div>
@@ -171,7 +171,7 @@ export function ReportsClient({ trades }: { trades: Trade[] }) {
 function Header() {
   return (
     <div>
-      <div className="text-[19px] font-bold">Reports &amp; Insights</div>
+      <div className="text-[22px] font-bold">Reports &amp; Insights</div>
       <div className="text-[12.5px] text-text-muted mt-0.5">Where the edge shows up — and where it leaks</div>
     </div>
   );

@@ -29,7 +29,7 @@ export function DashboardClient({ trades, startingBalance }: { trades: Trade[]; 
     <div className="px-7 pt-6 pb-10">
       <div className="mb-[18px] flex items-stretch gap-4 relative">
         <div className="flex-1 min-w-0 flex flex-col relative">
-          <div className="text-[19px] font-bold">Dashboard</div>
+          <div className="text-[22px] font-bold">Dashboard</div>
           <div className="text-[12.5px] text-text-muted mt-0.5 mb-3">Warrior-style momentum log</div>
           <div className="flex items-center gap-2 flex-wrap mt-auto">
             <div className="relative">

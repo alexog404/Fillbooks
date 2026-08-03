@@ -98,7 +98,7 @@ export function JournalClient({ trades, notesByDate }: { trades: Trade[]; notesB
       )}
 
       <div className="bg-surface border border-border rounded-[10px] p-4">
-        <div className="text-[13px] font-bold mb-2.5">Notes for {dateShort(date)}</div>
+        <div className="text-[16px] font-bold mb-2.5">Notes for {dateShort(date)}</div>
         <textarea
           value={noteDraft}
           onChange={(e) => {

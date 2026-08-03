@@ -20,7 +20,7 @@ export default async function TradeDetailPage({
   if (!trade) {
     return (
       <div className="px-7 py-6">
-        <div className="text-[19px] font-bold">Trade not found</div>
+        <div className="text-[22px] font-bold">Trade not found</div>
         <p className="text-text-muted text-sm mt-2">This trade may have been removed by a rebuild.</p>
       </div>
     );

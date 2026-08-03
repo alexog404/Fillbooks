@@ -22,7 +22,7 @@ export default async function SettingsPage({
 
   return (
     <div className="px-7 pt-6 pb-10 max-w-[1040px]">
-      <div className="text-[19px] font-bold mb-0.5">Settings</div>
+      <div className="text-[22px] font-bold mb-0.5">Settings</div>
       <div className="text-[12.5px] text-text-muted mb-[18px]">Connections, accounts, and how the app looks</div>
 
       {params.schwab_connected && (
@@ -43,7 +43,7 @@ export default async function SettingsPage({
       <StartingBalanceCard startingBalance={startingBalance} />
 
       <div className="bg-surface border border-border rounded-[10px] px-5 py-[18px]">
-        <div className="text-[15px] font-bold mb-3.5">Display</div>
+        <div className="text-[18px] font-bold mb-3.5">Display</div>
         <div className="flex items-center justify-between py-2.5 border-t border-border">
           <div>
             <div className="text-[13px] font-semibold">Display timezone</div>
