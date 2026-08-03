@@ -3,6 +3,10 @@
 .DS_Store
 supabase/.temp
 
+# real broker statement exports -- never commit these (public repo)
+*AccountStatement*.csv
+*-statement.csv
+
 # dependencies
 /node_modules
 

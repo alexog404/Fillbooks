@@ -34,10 +34,10 @@ export const brokerConnections = pgTable(
   (t) => [unique("broker_connections_broker_unique").on(t.broker)],
 );
 
-// One row per closed lot (see CLAUDE.md's FIFO-boundary decision, once the
-// Schwab sync/FIFO-reconstruction feature lands) -- not yet populated by
-// anything real; this table exists now so the Dashboard/Trades UI has a
-// real (currently empty) source instead of mock data baked into the app.
+// One row per closed lot (see CLAUDE.md's FIFO-boundary decision). Derived
+// data -- rebuilt from `executions` on every CSV import, not hand-edited
+// directly except for the journal-ish fields below (mistakes, habits,
+// rating, target, stop, mae, mfe), which a rebuild leaves untouched.
 export const trades = pgTable("trades", {
   id: id(),
   // Local Y-M-D / H:M:S strings, not `timestamptz` -- see CLAUDE.md's
@@ -63,3 +63,25 @@ export const trades = pgTable("trades", {
   mae: money("mae"),
   mfe: money("mfe"),
 });
+
+// Raw fills from an imported CSV statement -- insert-once, deduped, never
+// mutated. `trades` is fully derived from these (rebuild.ts drops and
+// re-derives per symbol), so re-importing an overlapping statement can't
+// double-count: the dedupe hash is checked before insert, not after.
+export const executions = pgTable(
+  "executions",
+  {
+    id: id(),
+    // sha256(date|time|symbol|side|qty|price) -- see import/dedupe.ts. Ref #
+    // is deliberately excluded: it's not unique across a partial fill's
+    // sibling executions (see CLAUDE.md).
+    dedupeHash: text("dedupe_hash").notNull(),
+    date: text("date").notNull(),
+    time: text("time").notNull(),
+    symbol: text("symbol").notNull(),
+    side: text("side", { enum: ["buy", "sell"] }).notNull(),
+    qty: qty("qty").notNull(),
+    price: money("price").notNull(),
+  },
+  (t) => [unique("executions_dedupe_hash_unique").on(t.dedupeHash)],
+);
