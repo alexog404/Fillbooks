@@ -1,5 +1,7 @@
 import { db } from "@/db";
 import { getAllTrades, getTradeById, getTradeExecutions } from "@/trades/queries";
+import { getBarsForSession } from "@/market-data/barCache";
+import { sessionWindowForDate } from "@/market-data/sessionWindow";
 import { TradeDetailClient } from "@/components/trade-detail/trade-detail-client";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +26,12 @@ export default async function TradeDetailPage({
     );
   }
 
-  const [executions, allTrades] = await Promise.all([getTradeExecutions(db, id), getAllTrades(db)]);
+  const { startUtc, endUtc } = sessionWindowForDate(trade.date);
+  const [executions, allTrades, bars] = await Promise.all([
+    getTradeExecutions(db, id),
+    getAllTrades(db),
+    getBarsForSession(db, trade.symbol, startUtc, endUtc),
+  ]);
 
   const sorted = [...allTrades].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   const idx = sorted.findIndex((t) => t.id === id);
@@ -39,6 +46,7 @@ export default async function TradeDetailPage({
     <TradeDetailClient
       trade={trade}
       executions={executions}
+      bars={bars}
       dayTrades={dayTrades}
       prevId={prevId}
       nextId={nextId}

@@ -1,4 +1,4 @@
-import { boolean, integer, numeric, pgTable, text, timestamp, unique } from "drizzle-orm/pg-core";
+import { boolean, integer, numeric, pgTable, primaryKey, text, timestamp, unique } from "drizzle-orm/pg-core";
 
 const id = () =>
   text("id")
@@ -116,3 +116,24 @@ export const appSettings = pgTable("app_settings", {
   id: text("id").primaryKey().default("default"),
   startingBalance: money("starting_balance"),
 });
+
+// Read-through cache over Alpaca (or any future MarketDataProvider) --
+// keyed by bar identity only, no per-user scoping (a price bar means the
+// same thing to anyone who fetches it). A past session's bars never
+// change, so any cached row for a range is treated as proof the whole
+// range was already fetched.
+export const priceBars = pgTable(
+  "price_bars",
+  {
+    symbol: text("symbol").notNull(),
+    timeframe: text("timeframe").notNull(),
+    ts: utcMs("ts").notNull(),
+    o: money("o").notNull(),
+    h: money("h").notNull(),
+    l: money("l").notNull(),
+    c: money("c").notNull(),
+    v: integer("v"),
+    source: text("source").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.symbol, t.timeframe, t.ts] })],
+);

@@ -4,14 +4,17 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { dateShort, money, pnlColorVar, type Trade } from "@/lib/trades";
 import type { TradeExecutionRow } from "@/trades/queries";
+import type { Bar } from "@/market-data/provider";
 import { updateTradeJournal } from "@/trades/actions";
 import { ChipsEditor } from "./chips-editor";
+import { TradeChart } from "./trade-chart";
 
 const FROM_LABELS: Record<string, string> = { dashboard: "Dashboard", trades: "Trades", journal: "Daily Journal" };
 
 export function TradeDetailClient({
   trade,
   executions,
+  bars,
   dayTrades,
   prevId,
   nextId,
@@ -19,6 +22,7 @@ export function TradeDetailClient({
 }: {
   trade: Trade;
   executions: TradeExecutionRow[];
+  bars: Bar[];
   dayTrades: { id: string; symbol: string; time: string; pnl: number }[];
   prevId: string | null;
   nextId: string | null;
@@ -189,9 +193,7 @@ export function TradeDetailClient({
         </div>
 
         <div className="flex flex-col gap-3 min-w-0">
-          <div className="bg-surface border border-border rounded-[10px] p-6 text-center text-text-muted text-xs">
-            Price chart requires a real market data connection, not yet configured — entry ${trade.entry.toFixed(2)} → exit ${trade.exit.toFixed(2)}.
-          </div>
+          <TradeChart bars={bars} executions={executions} target={trade.target} stop={trade.stop} />
 
           <div className="bg-surface border border-border rounded-[10px]">
             <div className="flex gap-1 px-3.5 pt-2.5 border-b border-border">
