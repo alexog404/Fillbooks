@@ -46,7 +46,7 @@ export function JournalClient({ trades, notesByDate }: { trades: Trade[]; notesB
         <div className="flex items-center gap-2.5">
           <button type="button" onClick={() => shiftDay(-1)} className="w-7 h-7 rounded-md bg-surface-2 border border-border flex items-center justify-center cursor-pointer">‹</button>
           <div className="relative">
-            <button type="button" onClick={() => setShowPicker((v) => !v)} className="text-base font-bold px-2 py-1 rounded-md cursor-pointer">
+            <button type="button" onClick={() => setShowPicker((v) => !v)} className="text-[19px] font-bold px-2 py-1 rounded-md cursor-pointer">
               {dateShort(date)}
             </button>
             {showPicker && (
@@ -59,37 +59,37 @@ export function JournalClient({ trades, notesByDate }: { trades: Trade[]; notesB
 
       {dayTrades.length === 0 ? (
         <div className="border border-dashed rounded-xl px-6 py-14 text-center text-text-muted mb-3.5" style={{ borderColor: "var(--border-strong)" }}>
-          <div className="text-2xl mb-2.5">✎</div>
-          <div className="text-sm font-semibold text-text-secondary">No trades this day</div>
-          <div className="text-xs mt-1">Nothing was logged on {dateShort(date)}. Jump to another day with a trade to journal.</div>
+          <div className="text-[27px] mb-2.5">✎</div>
+          <div className="text-[17px] font-semibold text-text-secondary">No trades this day</div>
+          <div className="text-[15px] mt-1">Nothing was logged on {dateShort(date)}. Jump to another day with a trade to journal.</div>
         </div>
       ) : (
         <>
           <div className="bg-surface border border-border rounded-[10px] px-4.5 py-3.5 mb-3.5 flex items-center gap-7">
             <div>
-              <div className="text-[10.5px] text-text-muted uppercase">Day Net P&L</div>
-              <div className="text-xl font-extrabold font-mono mt-0.5" style={{ color: pnlColorVar(kpis.netPnl) }}>{money(kpis.netPnl, true)}</div>
+              <div className="text-[13.5px] text-text-muted uppercase">Day Net P&L</div>
+              <div className="text-[23px] font-extrabold font-mono mt-0.5" style={{ color: pnlColorVar(kpis.netPnl) }}>{money(kpis.netPnl, true)}</div>
             </div>
             <div>
-              <div className="text-[10.5px] text-text-muted uppercase">Trades</div>
-              <div className="text-xl font-extrabold font-mono mt-0.5">{kpis.total}</div>
+              <div className="text-[13.5px] text-text-muted uppercase">Trades</div>
+              <div className="text-[23px] font-extrabold font-mono mt-0.5">{kpis.total}</div>
             </div>
             <div>
-              <div className="text-[10.5px] text-text-muted uppercase">Win Rate</div>
-              <div className="text-xl font-extrabold font-mono mt-0.5">{kpis.winRate.toFixed(0)}%</div>
+              <div className="text-[13.5px] text-text-muted uppercase">Win Rate</div>
+              <div className="text-[23px] font-extrabold font-mono mt-0.5">{kpis.winRate.toFixed(0)}%</div>
             </div>
           </div>
 
           <div className="mb-3.5">
-            <div className="text-[11.5px] text-text-muted mb-2">Trades — click to open</div>
+            <div className="text-[14.5px] text-text-muted mb-2">Trades — click to open</div>
             <div className="flex gap-2.5 overflow-x-auto pb-1">
               {dayTrades.map((t) => (
                 <Link key={t.id} href={`/trades/${t.id}?from=journal`} className="flex-none min-w-[150px] bg-surface border border-border rounded-lg px-3 py-2.5 hover:border-primary">
                   <div className="flex justify-between items-center">
                     <div className="font-bold font-mono">{t.symbol}</div>
                   </div>
-                  <div className="text-[15px] font-bold font-mono mt-1" style={{ color: pnlColorVar(t.pnl) }}>{money(t.pnl, true)}</div>
-                  <div className="text-[10.5px] text-text-muted mt-0.5">{t.time}</div>
+                  <div className="text-[18px] font-bold font-mono mt-1" style={{ color: pnlColorVar(t.pnl) }}>{money(t.pnl, true)}</div>
+                  <div className="text-[13.5px] text-text-muted mt-0.5">{t.time}</div>
                 </Link>
               ))}
             </div>
@@ -106,11 +106,11 @@ export function JournalClient({ trades, notesByDate }: { trades: Trade[]; notesB
             setNoteSaved(false);
           }}
           placeholder="Pre-market plan, how the day went, what to improve tomorrow..."
-          className="w-full min-h-[140px] bg-surface-2 border border-border rounded-lg px-3 py-2.5 text-[13px] leading-relaxed resize-y"
+          className="w-full min-h-[140px] bg-surface-2 border border-border rounded-lg px-3 py-2.5 text-[16px] leading-relaxed resize-y"
         />
         <div className="flex items-center justify-between mt-2">
-          <div className="text-[11px] text-text-muted">{noteSaved ? "Saved" : "Unsaved changes"}</div>
-          <button type="button" onClick={saveNote} disabled={isPending || noteSaved} className="text-[11px] px-3 py-1.5 rounded-md bg-primary text-white font-bold cursor-pointer disabled:opacity-40">
+          <div className="text-[14px] text-text-muted">{noteSaved ? "Saved" : "Unsaved changes"}</div>
+          <button type="button" onClick={saveNote} disabled={isPending || noteSaved} className="text-[14px] px-3 py-1.5 rounded-md bg-primary text-white font-bold cursor-pointer disabled:opacity-40">
             Save
           </button>
         </div>

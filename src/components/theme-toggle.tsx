@@ -31,7 +31,7 @@ export function ThemeToggle() {
       <button
         type="button"
         onClick={() => pick("dark")}
-        className="flex-1 rounded-md py-1.5 text-xs font-semibold cursor-pointer"
+        className="flex-1 rounded-md py-1.5 text-[15px] font-semibold cursor-pointer"
         style={{
           background: theme === "dark" ? "var(--accent-soft)" : "transparent",
           color: theme === "dark" ? "var(--primary)" : "var(--text-muted)",
@@ -42,7 +42,7 @@ export function ThemeToggle() {
       <button
         type="button"
         onClick={() => pick("light")}
-        className="flex-1 rounded-md py-1.5 text-xs font-semibold cursor-pointer"
+        className="flex-1 rounded-md py-1.5 text-[15px] font-semibold cursor-pointer"
         style={{
           background: theme === "light" ? "var(--accent-soft)" : "transparent",
           color: theme === "light" ? "var(--primary)" : "var(--text-muted)",

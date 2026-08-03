@@ -30,24 +30,24 @@ export function BrokerConnectionCard({ connection, state }: { connection: Broker
   return (
     <div className="rounded-xl px-[22px] py-5 mb-4 border" style={{ borderColor: cardBorder, background: cardBg }}>
       <div className="flex items-center gap-2.5 mb-2.5">
-        <span className="text-[10.5px] font-extrabold tracking-[0.04em] px-2.5 py-1 rounded-md" style={{ color: badge.color, background: badge.bg }}>
+        <span className="text-[13.5px] font-extrabold tracking-[0.04em] px-2.5 py-1 rounded-md" style={{ color: badge.color, background: badge.bg }}>
           {badge.text}
         </span>
         <div className="text-[19px] font-bold">Schwab connection</div>
       </div>
-      <div className="text-[12.5px] text-text-secondary leading-[1.55] max-w-[640px] mb-4">{MESSAGE[state]}</div>
+      <div className="text-[15.5px] text-text-secondary leading-[1.55] max-w-[640px] mb-4">{MESSAGE[state]}</div>
 
       {connection && (
         <div className="flex gap-10 flex-wrap mb-[18px]">
           <div>
-            <div className="text-[10px] text-text-muted uppercase tracking-[0.04em] mb-1">
+            <div className="text-[13px] text-text-muted uppercase tracking-[0.04em] mb-1">
               {state === "expired" ? "Expired" : "Expires"}
             </div>
-            <div className="text-[12.5px] font-mono">{fmtEt(connection.tokenExpiresAt)}</div>
+            <div className="text-[15.5px] font-mono">{fmtEt(connection.tokenExpiresAt)}</div>
           </div>
           <div>
-            <div className="text-[10px] text-text-muted uppercase tracking-[0.04em] mb-1">Last Synced</div>
-            <div className="text-[12.5px] font-mono">{fmtEt(connection.lastSyncAt)}</div>
+            <div className="text-[13px] text-text-muted uppercase tracking-[0.04em] mb-1">Last Synced</div>
+            <div className="text-[15.5px] font-mono">{fmtEt(connection.lastSyncAt)}</div>
           </div>
         </div>
       )}
@@ -56,7 +56,7 @@ export function BrokerConnectionCard({ connection, state }: { connection: Broker
         {(state === "disconnected" || state === "expired") && (
           <a
             href="/api/schwab/authorize"
-            className="px-[18px] py-2.5 rounded-lg bg-primary text-white text-[13px] font-bold cursor-pointer"
+            className="px-[18px] py-2.5 rounded-lg bg-primary text-white text-[16px] font-bold cursor-pointer"
           >
             {state === "expired" ? "Re-authorize" : "Connect"}
           </a>
@@ -67,12 +67,12 @@ export function BrokerConnectionCard({ connection, state }: { connection: Broker
               type="button"
               disabled
               title="Sync logic isn't built yet -- coming in a future feature"
-              className="px-[18px] py-2.5 rounded-lg bg-surface-2 border border-border text-text-muted text-[13px] font-semibold cursor-not-allowed opacity-60"
+              className="px-[18px] py-2.5 rounded-lg bg-surface-2 border border-border text-text-muted text-[16px] font-semibold cursor-not-allowed opacity-60"
             >
               Sync now
             </button>
             <form action={disconnectSchwab}>
-              <button type="submit" className="px-[18px] py-2.5 rounded-lg bg-transparent border border-border text-text-muted text-[13px] font-semibold cursor-pointer">
+              <button type="submit" className="px-[18px] py-2.5 rounded-lg bg-transparent border border-border text-text-muted text-[16px] font-semibold cursor-pointer">
                 Disconnect
               </button>
             </form>

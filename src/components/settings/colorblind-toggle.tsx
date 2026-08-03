@@ -20,7 +20,7 @@ export function ColorblindToggle() {
       <button
         type="button"
         onClick={() => pick(false)}
-        className="px-3 py-2 text-xs font-semibold cursor-pointer"
+        className="px-3 py-2 text-[15px] font-semibold cursor-pointer"
         style={{ background: !enabled ? "var(--accent-soft)" : "transparent", color: !enabled ? "var(--primary)" : "var(--text-muted)" }}
       >
         Green / Red
@@ -28,7 +28,7 @@ export function ColorblindToggle() {
       <button
         type="button"
         onClick={() => pick(true)}
-        className="px-3 py-2 text-xs font-semibold cursor-pointer"
+        className="px-3 py-2 text-[15px] font-semibold cursor-pointer"
         style={{ background: enabled ? "var(--accent-soft)" : "transparent", color: enabled ? "var(--primary)" : "var(--text-muted)" }}
       >
         Blue / Orange

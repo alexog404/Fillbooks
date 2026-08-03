@@ -25,7 +25,7 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
           <button
             type="button"
             onClick={() => setMonthKey(shiftMonthKey(monthKey, -1))}
-            className="w-[22px] h-[22px] rounded-md bg-surface-2 border border-border flex items-center justify-center cursor-pointer text-xs"
+            className="w-[22px] h-[22px] rounded-md bg-surface-2 border border-border flex items-center justify-center cursor-pointer text-[15px]"
           >
             ‹
           </button>
@@ -33,13 +33,13 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
           <button
             type="button"
             onClick={() => setMonthKey(shiftMonthKey(monthKey, 1))}
-            className="w-[22px] h-[22px] rounded-md bg-surface-2 border border-border flex items-center justify-center cursor-pointer text-xs"
+            className="w-[22px] h-[22px] rounded-md bg-surface-2 border border-border flex items-center justify-center cursor-pointer text-[15px]"
           >
             ›
           </button>
-          <div className="text-xs font-bold font-mono ml-1" style={{ color: pnlColorVar(monthPct) }}>{monthPctText}</div>
+          <div className="text-[15px] font-bold font-mono ml-1" style={{ color: pnlColorVar(monthPct) }}>{monthPctText}</div>
         </div>
-        <div className="text-[11px] text-text-muted">Click a day with trades for detail</div>
+        <div className="text-[14px] text-text-muted">Click a day with trades for detail</div>
       </div>
 
       <div className="relative isolate">
@@ -47,7 +47,7 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
           className="absolute -right-px -top-[3px] -bottom-[3px] rounded-lg pointer-events-none z-0 border-[1.5px]"
           style={{ width: "calc((100% - 42px)/8 + 2px)", borderColor: "var(--primary)", background: "var(--accent-soft)" }}
         />
-        <div className="relative z-10 grid grid-cols-8 gap-1.5 mb-1 text-[9px] text-text-muted">
+        <div className="relative z-10 grid grid-cols-8 gap-1.5 mb-1 text-[12px] text-text-muted">
           <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
           <div className="font-bold text-center" style={{ color: "var(--primary)" }}>Weeks</div>
         </div>
@@ -58,7 +58,7 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
               if (cell.empty) {
                 return (
                   <div key={ci} className="h-16 min-w-0 box-border rounded-md p-1 bg-surface-2 border border-border flex flex-col items-center justify-center text-center overflow-hidden">
-                    <div className="text-[9.5px] text-text-muted whitespace-nowrap">{cell.day}</div>
+                    <div className="text-[12.5px] text-text-muted whitespace-nowrap">{cell.day}</div>
                   </div>
                 );
               }
@@ -72,15 +72,15 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
                   className="h-16 min-w-0 box-border rounded-md p-1 cursor-pointer overflow-hidden flex flex-col items-center justify-center text-center hover:brightness-110"
                   style={{ background: bg, border: `1px solid ${border}` }}
                 >
-                  <div className="text-[9.5px] text-text-muted whitespace-nowrap">{cell.day}</div>
-                  <div className="text-[10px] font-bold font-mono mt-[3px] whitespace-nowrap" style={{ color: pnlColorVar(cell.pnl) }}>{moneyCompact(cell.pnl)}</div>
-                  <div className="text-[8px] text-text-muted mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">{cell.count}t · {cell.r.toFixed(1)}R</div>
+                  <div className="text-[12.5px] text-text-muted whitespace-nowrap">{cell.day}</div>
+                  <div className="text-[13px] font-bold font-mono mt-[3px] whitespace-nowrap" style={{ color: pnlColorVar(cell.pnl) }}>{moneyCompact(cell.pnl)}</div>
+                  <div className="text-[11px] text-text-muted mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">{cell.count}t · {cell.r.toFixed(1)}R</div>
                 </div>
               );
             })}
             <div className="h-16 min-w-0 box-border rounded-md bg-surface-2 border border-border flex flex-col items-center justify-center p-1 text-center overflow-hidden">
-              <div className="text-[10px] font-bold font-mono whitespace-nowrap" style={{ color: pnlColorVar(week.total) }}>{moneyCompact(week.total)}</div>
-              <div className="text-[7.5px] text-text-muted mt-0.5 whitespace-nowrap">W{wi + 1}</div>
+              <div className="text-[13px] font-bold font-mono whitespace-nowrap" style={{ color: pnlColorVar(week.total) }}>{moneyCompact(week.total)}</div>
+              <div className="text-[10.5px] text-text-muted mt-0.5 whitespace-nowrap">W{wi + 1}</div>
             </div>
           </div>
         ))}
@@ -91,7 +91,7 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
         style={{ maxHeight: dayViewDate ? 400 : 0, opacity: dayViewDate ? 1 : 0, marginTop: dayViewDate ? 12 : 0 }}
       >
         <div className="border-t border-border pt-3">
-          <div className="text-[12.5px] font-bold mb-2">
+          <div className="text-[15.5px] font-bold mb-2">
             {dayViewDate && dateShort(dayViewDate)} · {dayTrades.length} trade{dayTrades.length !== 1 ? "s" : ""}
           </div>
           {dayTrades.map((t) => (
@@ -101,10 +101,10 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
               className="flex items-center justify-between px-2.5 py-2 rounded-md mb-1 bg-surface-2 hover:bg-surface-hover"
             >
               <div className="flex items-center gap-2">
-                <div className="text-xs font-bold font-mono">{t.symbol}</div>
-                <div className="text-[10.5px] text-text-muted">{t.time}</div>
+                <div className="text-[15px] font-bold font-mono">{t.symbol}</div>
+                <div className="text-[13.5px] text-text-muted">{t.time}</div>
               </div>
-              <div className="text-xs font-bold font-mono" style={{ color: pnlColorVar(t.pnl) }}>{money(t.pnl, true)}</div>
+              <div className="text-[15px] font-bold font-mono" style={{ color: pnlColorVar(t.pnl) }}>{money(t.pnl, true)}</div>
             </Link>
           ))}
         </div>

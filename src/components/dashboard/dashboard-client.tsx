@@ -30,13 +30,13 @@ export function DashboardClient({ trades, startingBalance }: { trades: Trade[]; 
       <div className="mb-[18px] flex items-stretch gap-4 relative">
         <div className="flex-1 min-w-0 flex flex-col relative">
           <div className="text-[22px] font-bold">Dashboard</div>
-          <div className="text-[12.5px] text-text-muted mt-0.5 mb-3">Warrior-style momentum log</div>
+          <div className="text-[15.5px] text-text-muted mt-0.5 mb-3">Warrior-style momentum log</div>
           <div className="flex items-center gap-2 flex-wrap mt-auto">
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setShowPicker((v) => !v)}
-                className="text-xs px-3 py-1.5 rounded-md bg-surface-2 border border-border text-text-secondary cursor-pointer flex items-center gap-1.5"
+                className="text-[15px] px-3 py-1.5 rounded-md bg-surface-2 border border-border text-text-secondary cursor-pointer flex items-center gap-1.5"
               >
                 📅 {weekLabel} ▾
               </button>
@@ -55,7 +55,7 @@ export function DashboardClient({ trades, startingBalance }: { trades: Trade[]; 
                 />
               )}
             </div>
-            <div className="text-xs px-3 py-1.5 rounded-md bg-surface-2 border border-border text-text-secondary">Cash · Schwab</div>
+            <div className="text-[15px] px-3 py-1.5 rounded-md bg-surface-2 border border-border text-text-secondary">Cash · Schwab</div>
           </div>
         </div>
         <AccountBalanceCard trades={trades} startingBalance={startingBalance} weekStartBalance={weekStartBalance} weekPnlSum={weekPnlSum} />
@@ -63,9 +63,9 @@ export function DashboardClient({ trades, startingBalance }: { trades: Trade[]; 
 
       {trades.length === 0 ? (
         <div className="border border-dashed rounded-xl px-6 py-16 text-center text-text-muted" style={{ borderColor: "var(--border-strong)" }}>
-          <div className="text-3xl mb-2.5">◇</div>
-          <div className="text-sm font-semibold text-text-secondary mb-1">No trades logged yet</div>
-          <div className="text-[12.5px] max-w-[340px] mx-auto">
+          <div className="text-[33px] mb-2.5">◇</div>
+          <div className="text-[17px] font-semibold text-text-secondary mb-1">No trades logged yet</div>
+          <div className="text-[15.5px] max-w-[340px] mx-auto">
             Connect your Schwab account in Settings to start seeing your KPIs, calendar, and equity curve here.
           </div>
         </div>

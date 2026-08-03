@@ -16,7 +16,7 @@ export function DailyPnlChart({ trades }: { trades: Trade[] }) {
     return (
       <div className="bg-surface border border-border rounded-[10px] px-[18px] py-4">
         <div className="text-[16px] font-bold mb-2">Daily P&amp;L — Win vs Loss Days</div>
-        <div className="h-[210px] flex items-center justify-center text-sm text-text-muted">No trades yet.</div>
+        <div className="h-[210px] flex items-center justify-center text-[17px] text-text-muted">No trades yet.</div>
       </div>
     );
   }
@@ -43,10 +43,10 @@ export function DailyPnlChart({ trades }: { trades: Trade[] }) {
     <div className="bg-surface border border-border rounded-[10px] px-[18px] py-4">
       <div className="flex items-center justify-between mb-2.5">
         <div className="text-[16px] font-bold">Daily P&amp;L — Win vs Loss Days</div>
-        <div className="text-xs font-bold font-mono" style={{ color: pnlColorVar(equityEnd) }}>{money(equityEnd, true)}</div>
+        <div className="text-[15px] font-bold font-mono" style={{ color: pnlColorVar(equityEnd) }}>{money(equityEnd, true)}</div>
       </div>
       <div className="flex">
-        <div className="flex flex-col justify-between h-[210px] pr-2 text-[10px] text-text-muted font-mono text-right">
+        <div className="flex flex-col justify-between h-[210px] pr-2 text-[13px] text-text-muted font-mono text-right">
           {eqTicks.map((tk, i) => (
             <div key={i}>{tk.label}</div>
           ))}
@@ -63,7 +63,7 @@ export function DailyPnlChart({ trades }: { trades: Trade[] }) {
           </svg>
           <div className="relative h-4">
             {eqXLabels.map((xl, i) => (
-              <div key={i} className="absolute top-0 text-[10px] text-text-muted whitespace-nowrap" style={{ left: xl.x, transform: "translateX(-50%)" }}>
+              <div key={i} className="absolute top-0 text-[13px] text-text-muted whitespace-nowrap" style={{ left: xl.x, transform: "translateX(-50%)" }}>
                 {xl.label}
               </div>
             ))}

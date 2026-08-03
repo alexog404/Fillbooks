@@ -78,12 +78,12 @@ export function TradesTable({ trades }: { trades: Trade[] }) {
       <Link
         href={`/trades/${t.id}?from=trades`}
         style={{ gridTemplateColumns: COLS }}
-        className="grid gap-2 px-4 py-2 text-xs border-t border-border items-center hover:bg-surface-hover"
+        className="grid gap-2 px-4 py-2 text-[15px] border-t border-border items-center hover:bg-surface-hover"
       >
         <div className="text-text-secondary">{dateShort(t.date)}</div>
         <div className="text-text-muted font-mono">{t.time}</div>
         <div className="font-bold font-mono">{t.symbol}</div>
-        <div className="font-semibold text-[10.5px]" style={{ color: t.side === "long" ? "var(--win)" : "var(--loss)" }}>
+        <div className="font-semibold text-[13.5px]" style={{ color: t.side === "long" ? "var(--win)" : "var(--loss)" }}>
           {t.side === "long" ? "L" : "S"}
         </div>
         <div className="text-right font-mono text-text-secondary">{t.qty}</div>
@@ -94,7 +94,7 @@ export function TradesTable({ trades }: { trades: Trade[] }) {
           {t.r != null ? t.r.toFixed(1) + "R" : "—"}
         </div>
         <div className="text-text-muted font-mono">{formatDuration(t.durationSeconds)}</div>
-        <div className="flex items-center gap-1.5 text-[11px] text-text-secondary">
+        <div className="flex items-center gap-1.5 text-[14px] text-text-secondary">
           <span className="w-1.5 h-1.5 rounded-full flex-none" style={{ background: meta.dot }} />
           {meta.label}
         </div>
@@ -113,7 +113,7 @@ export function TradesTable({ trades }: { trades: Trade[] }) {
             <button
               type="button"
               onClick={() => setShowPicker((v) => !v)}
-              className="text-xs px-3 py-1.5 rounded-md bg-surface-2 border border-border text-text-secondary cursor-pointer flex items-center gap-1.5"
+              className="text-[15px] px-3 py-1.5 rounded-md bg-surface-2 border border-border text-text-secondary cursor-pointer flex items-center gap-1.5"
             >
               📅 {rangeLabel} ▾
             </button>
@@ -138,14 +138,14 @@ export function TradesTable({ trades }: { trades: Trade[] }) {
 
       {filtered.length === 0 ? (
         <div className="border border-dashed rounded-xl px-6 py-14 text-center text-text-muted" style={{ borderColor: "var(--border-strong)" }}>
-          <div className="text-2xl mb-2.5">▤</div>
-          <div className="text-sm font-semibold text-text-secondary">No trades match these filters</div>
-          <div className="text-xs mt-1">Try widening the date range.</div>
+          <div className="text-[27px] mb-2.5">▤</div>
+          <div className="text-[17px] font-semibold text-text-secondary">No trades match these filters</div>
+          <div className="text-[15px] mt-1">Try widening the date range.</div>
         </div>
       ) : (
         <div className="bg-surface border border-border rounded-[10px] overflow-x-auto">
           <div className="min-w-[980px]">
-            <div style={{ gridTemplateColumns: COLS }} className="grid gap-2 px-4 py-2 text-[10.2px] text-text-muted uppercase tracking-[0.03em] bg-surface-2">
+            <div style={{ gridTemplateColumns: COLS }} className="grid gap-2 px-4 py-2 text-[13.2px] text-text-muted uppercase tracking-[0.03em] bg-surface-2">
               <div onClick={() => toggleSort("date")} className="cursor-pointer">
                 Date{sortKey === "date" ? (sortDir === "asc" ? " ▲" : " ▼") : ""}
               </div>
@@ -169,8 +169,8 @@ export function TradesTable({ trades }: { trades: Trade[] }) {
               ? groups.map((g) => (
                   <div key={g.key}>
                     <div className="flex items-center justify-between px-4 py-2 bg-surface-2 border-t border-border">
-                      <div className="text-[11.5px] font-bold text-text-secondary">{g.label}</div>
-                      <div className="text-[11.5px] font-bold font-mono" style={{ color: pnlColorVar(g.total) }}>{money(g.total, true)}</div>
+                      <div className="text-[14.5px] font-bold text-text-secondary">{g.label}</div>
+                      <div className="text-[14.5px] font-bold font-mono" style={{ color: pnlColorVar(g.total) }}>{money(g.total, true)}</div>
                     </div>
                     {g.rows.map((t) => (
                       <Row key={t.id} t={t} />

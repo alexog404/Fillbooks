@@ -63,9 +63,9 @@ export function KpiCards({ weekTrades, allTrades }: { weekTrades: Trade[]; allTr
               <path d={lossRatePath} fill="none" strokeWidth="9" strokeLinecap="round" stroke="var(--loss)" />
             </svg>
             <div className="flex gap-1 justify-center mt-0.5">
-              <span className="text-[9.5px] font-bold px-1.5 rounded-full" style={{ background: "color-mix(in srgb, var(--win) 13%, transparent)", color: "var(--win)" }}>{kpis.winCount}</span>
-              <span className="text-[9.5px] font-bold px-1.5 rounded-full" style={{ background: "rgba(59,130,246,0.13)", color: "#3b82f6" }}>{beCount}</span>
-              <span className="text-[9.5px] font-bold px-1.5 rounded-full" style={{ background: "color-mix(in srgb, var(--loss) 13%, transparent)", color: "var(--loss)" }}>{kpis.lossCount}</span>
+              <span className="text-[12.5px] font-bold px-1.5 rounded-full" style={{ background: "color-mix(in srgb, var(--win) 13%, transparent)", color: "var(--win)" }}>{kpis.winCount}</span>
+              <span className="text-[12.5px] font-bold px-1.5 rounded-full" style={{ background: "rgba(59,130,246,0.13)", color: "#3b82f6" }}>{beCount}</span>
+              <span className="text-[12.5px] font-bold px-1.5 rounded-full" style={{ background: "color-mix(in srgb, var(--loss) 13%, transparent)", color: "var(--loss)" }}>{kpis.lossCount}</span>
             </div>
           </div>
         }
@@ -80,7 +80,7 @@ export function KpiCards({ weekTrades, allTrades }: { weekTrades: Trade[]; allTr
               <div className="h-full" style={{ width: `${wlShare.toFixed(1)}%`, background: "var(--win)" }} />
               <div className="h-full" style={{ width: `${(100 - wlShare).toFixed(1)}%`, background: "var(--loss)" }} />
             </div>
-            <div className="flex justify-between w-[110px] text-[10px] font-mono mt-0.5">
+            <div className="flex justify-between w-[110px] text-[13px] font-mono mt-0.5">
               <span style={{ color: "var(--win)" }}>{money(kpis.avgWin, true)}</span>
               <span style={{ color: "var(--loss)" }}>{money(kpis.avgLoss, false)}</span>
             </div>
@@ -92,7 +92,7 @@ export function KpiCards({ weekTrades, allTrades }: { weekTrades: Trade[]; allTr
         label="Trade Expectancy"
         value={money(kpis.expectancy, true)}
         valueColor={pnlColorVar(kpis.expectancy)}
-        sub={<div className="text-[11px] text-text-muted mt-1">per trade</div>}
+        sub={<div className="text-[14px] text-text-muted mt-1">per trade</div>}
       />
 
       <Card
@@ -132,8 +132,8 @@ function Card({
   return (
     <div className="bg-surface border border-border rounded-[10px] px-4 py-3.5 flex items-center justify-between gap-2.5">
       <div>
-        <div className="text-[11px] text-text-muted mb-2 uppercase tracking-[0.04em]">{label}</div>
-        <div className="text-[21px] font-bold font-mono tabular-nums" style={valueColor ? { color: valueColor } : undefined}>{value}</div>
+        <div className="text-[14px] text-text-muted mb-2 uppercase tracking-[0.04em]">{label}</div>
+        <div className="text-[24px] font-bold font-mono tabular-nums" style={valueColor ? { color: valueColor } : undefined}>{value}</div>
         {sub}
       </div>
       {visual}

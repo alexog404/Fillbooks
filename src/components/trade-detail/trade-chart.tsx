@@ -140,8 +140,8 @@ export function TradeChart({ bars, executions, target, stop }: TradeChartProps) 
   if (bars.length === 0) {
     return (
       <div className="flex h-[300px] flex-col items-center justify-center gap-1.5 rounded-[10px] border border-border bg-surface text-center px-6">
-        <div className="text-xs font-semibold text-text-secondary">Chart data unavailable</div>
-        <div className="text-[11.5px] text-text-muted max-w-sm">
+        <div className="text-[15px] font-semibold text-text-secondary">Chart data unavailable</div>
+        <div className="text-[14.5px] text-text-muted max-w-sm">
           This trade is outside Alpaca&apos;s free-tier history window, or the symbol has no data on the IEX feed. The rest of this page still reflects the trade accurately.
         </div>
       </div>
@@ -159,7 +159,7 @@ export function TradeChart({ bars, executions, target, stop }: TradeChartProps) 
                 key={tf}
                 type="button"
                 onClick={() => setTimeframe(tf)}
-                className="rounded-md px-2 py-1 text-[11px] font-semibold cursor-pointer"
+                className="rounded-md px-2 py-1 text-[14px] font-semibold cursor-pointer"
                 style={{ background: timeframe === tf ? "var(--accent-soft)" : "transparent", color: timeframe === tf ? "var(--primary)" : "var(--text-muted)" }}
               >
                 {tf}m
@@ -168,7 +168,7 @@ export function TradeChart({ bars, executions, target, stop }: TradeChartProps) 
           </div>
         </div>
         {hovered && (
-          <div className="flex items-center gap-2.5 text-[11px] font-mono text-text-secondary">
+          <div className="flex items-center gap-2.5 text-[14px] font-mono text-text-secondary">
             <span>O <span className="text-foreground">{hovered.o.toFixed(2)}</span></span>
             <span>H <span className="text-foreground">{hovered.h.toFixed(2)}</span></span>
             <span>L <span className="text-foreground">{hovered.l.toFixed(2)}</span></span>
