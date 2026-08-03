@@ -4,9 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { buildCalendar, dateShort, monthLabel, moneyCompact, money, parseMonthKey, pnlColorVar, shiftMonthKey, type Trade } from "@/lib/trades";
 
-const STARTING_BALANCE = 10000;
-
-export function PnlCalendar({ trades, initialMonthKey }: { trades: Trade[]; initialMonthKey: string }) {
+export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trades: Trade[]; startingBalance: number; initialMonthKey: string }) {
   const [monthKey, setMonthKey] = useState(initialMonthKey);
   const [dayViewDate, setDayViewDate] = useState<string | null>(null);
 
@@ -14,7 +12,7 @@ export function PnlCalendar({ trades, initialMonthKey }: { trades: Trade[]; init
   const cal = buildCalendar(trades, y, m);
   const monthPnl = cal.weeks.reduce((s, w) => s + w.total, 0);
   const monthStartStr = `${y}-${String(m + 1).padStart(2, "0")}-01`;
-  const monthStartBalance = STARTING_BALANCE + trades.filter((t) => t.date < monthStartStr).reduce((s, t) => s + t.pnl, 0);
+  const monthStartBalance = startingBalance + trades.filter((t) => t.date < monthStartStr).reduce((s, t) => s + t.pnl, 0);
   const monthPct = monthStartBalance ? (monthPnl / monthStartBalance) * 100 : 0;
   const monthPctText = (monthPct >= 0 ? "+" : "") + monthPct.toFixed(2) + "%";
 

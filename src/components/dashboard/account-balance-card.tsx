@@ -3,14 +3,22 @@
 import { useState } from "react";
 import { dateShort, type Trade } from "@/lib/trades";
 
-const STARTING_BALANCE = 10000;
-
-export function AccountBalanceCard({ trades, weekStartBalance, weekPnlSum }: { trades: Trade[]; weekStartBalance: number; weekPnlSum: number }) {
+export function AccountBalanceCard({
+  trades,
+  startingBalance,
+  weekStartBalance,
+  weekPnlSum,
+}: {
+  trades: Trade[];
+  startingBalance: number;
+  weekStartBalance: number;
+  weekPnlSum: number;
+}) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 
   const sorted = [...trades].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-  let cum = STARTING_BALANCE;
-  const series = [STARTING_BALANCE, ...sorted.map((t) => (cum += t.pnl))];
+  let cum = startingBalance;
+  const series = [startingBalance, ...sorted.map((t) => (cum += t.pnl))];
   const dates: (string | null)[] = [sorted[0] ? sorted[0].date : null, ...sorted.map((t) => t.date)];
 
   const min = Math.min(...series);

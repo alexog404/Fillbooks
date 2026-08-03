@@ -3,6 +3,7 @@ import { splitSections, getSection } from "./split";
 import { parseTradeHistory } from "./tradeHistory";
 import { parseStatementLocalTime, formatDateTimeStrings } from "./statementTime";
 import { computeExecutionDedupeHash } from "./dedupe";
+import { parseNetLiquidatingValue } from "./accountSummary";
 
 export interface ParsedStatementExecution {
   dedupeHash: string;
@@ -21,6 +22,10 @@ export interface ParsedStatement {
    * handles stock trades so far. Reported so the import result can tell the
    * user something was intentionally left out, not silently dropped. */
   skippedOptionCount: number;
+  /** "Net Liquidating Value" from Account Summary -- the account's real
+   * balance as of the statement's end date, used to derive a real starting
+   * balance instead of a placeholder. Null if that section isn't present. */
+  netLiquidatingValue: number | null;
 }
 
 /**
@@ -53,5 +58,8 @@ export function parseStatement(text: string): ParsedStatement {
     executions.push({ dedupeHash, date, time, symbol: p.symbol, side: p.side, qty: p.qty, price: p.price });
   }
 
-  return { accountMask: header?.accountMask ?? null, executions, skippedOptionCount };
+  const summarySection = getSection(sections, "Account Summary");
+  const netLiquidatingValue = summarySection ? parseNetLiquidatingValue(summarySection) : null;
+
+  return { accountMask: header?.accountMask ?? null, executions, skippedOptionCount, netLiquidatingValue };
 }

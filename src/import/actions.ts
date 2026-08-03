@@ -5,6 +5,7 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { parseStatement } from "./parseStatement";
 import { rebuildTradesForSymbols } from "@/trades/rebuild";
+import { setStartingBalanceIfUnset } from "@/settings/queries";
 
 export interface ImportResult {
   success: boolean;
@@ -46,6 +47,15 @@ export async function importCsv(_prevState: ImportResult | null, formData: FormD
 
   const symbols = new Set(parsed.executions.map((e) => e.symbol));
   await rebuildTradesForSymbols(db, symbols);
+
+  // Derives a real starting balance from the statement's own ending balance
+  // instead of a placeholder -- only on first import (never overwrites a
+  // value the user has since edited or a later import already found).
+  if (parsed.netLiquidatingValue !== null) {
+    const allTrades = await db.select({ pnl: schema.trades.pnl }).from(schema.trades);
+    const totalRealizedPnl = allTrades.reduce((s, t) => s + t.pnl, 0);
+    await setStartingBalanceIfUnset(db, parsed.netLiquidatingValue - totalRealizedPnl);
+  }
 
   revalidatePath("/");
   revalidatePath("/settings");

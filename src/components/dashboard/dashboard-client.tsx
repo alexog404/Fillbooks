@@ -9,9 +9,7 @@ import { RecentTrades } from "./recent-trades";
 import { DailyPnlChart } from "./daily-pnl-chart";
 import { fmtDay, fmtLocal, fridayOf, mondayOf, type Trade } from "@/lib/trades";
 
-const STARTING_BALANCE = 10000;
-
-export function DashboardClient({ trades }: { trades: Trade[] }) {
+export function DashboardClient({ trades, startingBalance }: { trades: Trade[]; startingBalance: number }) {
   const allDates = [...new Set(trades.map((t) => t.date))].sort();
   const defaultWeekStart = allDates.length ? mondayOf(allDates[allDates.length - 1]) : mondayOf(fmtLocal(new Date()));
 
@@ -22,7 +20,7 @@ export function DashboardClient({ trades }: { trades: Trade[] }) {
 
   const weekTrades = trades.filter((t) => t.date >= weekStart && t.date <= weekEnd);
   const beforeWeekPnl = trades.filter((t) => t.date < weekStart).reduce((s, t) => s + t.pnl, 0);
-  const weekStartBalance = STARTING_BALANCE + beforeWeekPnl;
+  const weekStartBalance = startingBalance + beforeWeekPnl;
   const weekPnlSum = weekTrades.reduce((s, t) => s + t.pnl, 0);
 
   const weekLabel = fmtDay(weekStart) + " – " + fmtDay(weekEnd);
@@ -60,7 +58,7 @@ export function DashboardClient({ trades }: { trades: Trade[] }) {
             <div className="text-xs px-3 py-1.5 rounded-md bg-surface-2 border border-border text-text-secondary">Cash · Schwab</div>
           </div>
         </div>
-        <AccountBalanceCard trades={trades} weekStartBalance={weekStartBalance} weekPnlSum={weekPnlSum} />
+        <AccountBalanceCard trades={trades} startingBalance={startingBalance} weekStartBalance={weekStartBalance} weekPnlSum={weekPnlSum} />
       </div>
 
       {trades.length === 0 ? (
@@ -75,8 +73,8 @@ export function DashboardClient({ trades }: { trades: Trade[] }) {
         <>
           <KpiCards weekTrades={weekTrades} allTrades={trades} />
           <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: "1.75fr 1fr" }}>
-            <PnlCalendar trades={trades} initialMonthKey={weekStart.slice(0, 7)} />
-            <RecentTrades trades={trades} />
+            <PnlCalendar trades={trades} startingBalance={startingBalance} initialMonthKey={weekStart.slice(0, 7)} />
+            <RecentTrades trades={weekTrades} />
           </div>
           <DailyPnlChart trades={trades} />
         </>

@@ -85,3 +85,14 @@ export const executions = pgTable(
   },
   (t) => [unique("executions_dedupe_hash_unique").on(t.dedupeHash)],
 );
+
+// Single row, single-tenant -- no hardcoded "$10,000 starting balance" (that
+// was a mockup placeholder). Auto-derived on first CSV import from the
+// statement's own "Net Liquidating Value" minus the P&L of everything just
+// imported, then left alone on later imports; editable by hand in Settings
+// since deposits/withdrawals and untracked fees make the derived value an
+// estimate, not a guarantee.
+export const appSettings = pgTable("app_settings", {
+  id: text("id").primaryKey().default("default"),
+  startingBalance: money("starting_balance"),
+});

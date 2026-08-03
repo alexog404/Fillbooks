@@ -1,8 +1,10 @@
 import { db } from "@/db";
 import { getSchwabConnection } from "@/schwab/connectionQueries";
 import { getBrokerConnectionDisplayState } from "@/schwab/connectionDisplay";
+import { getStartingBalance } from "@/settings/queries";
 import { BrokerConnectionCard } from "@/components/settings/broker-connection-card";
 import { CsvImportCard } from "@/components/settings/csv-import-card";
+import { StartingBalanceCard } from "@/components/settings/starting-balance-card";
 import { ColorblindToggle } from "@/components/settings/colorblind-toggle";
 import { TimezonePicker } from "@/components/settings/timezone-picker";
 
@@ -16,6 +18,7 @@ export default async function SettingsPage({
   const params = await searchParams;
   const connection = await getSchwabConnection(db);
   const state = getBrokerConnectionDisplayState(connection);
+  const startingBalance = await getStartingBalance(db);
 
   return (
     <div className="px-7 pt-6 pb-10 max-w-[1040px]">
@@ -36,6 +39,8 @@ export default async function SettingsPage({
       <BrokerConnectionCard connection={connection} state={state} />
 
       <CsvImportCard schwabConnected={state === "connected"} />
+
+      <StartingBalanceCard startingBalance={startingBalance} />
 
       <div className="bg-surface border border-border rounded-[10px] px-5 py-[18px]">
         <div className="text-[15px] font-bold mb-3.5">Display</div>
