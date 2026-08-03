@@ -60,7 +60,7 @@ export function AccountBalanceCard({
     <div
       onMouseMove={onMouseMove}
       onMouseLeave={() => setHoverIdx(null)}
-      className="flex-none w-[350px] rounded-xl px-5 py-4 flex flex-col justify-between relative overflow-hidden bg-background h-[85px]"
+      className="flex-none w-[350px] rounded-xl px-5 py-4 flex flex-col justify-between relative overflow-hidden bg-background"
     >
       <svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0">
         <defs>
