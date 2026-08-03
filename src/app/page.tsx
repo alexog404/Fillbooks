@@ -1,8 +1,10 @@
-export default function DashboardPage() {
-  return (
-    <div className="px-7 py-6">
-      <div className="text-[19px] font-bold">Dashboard</div>
-      <p className="text-text-muted text-sm mt-2">Coming soon.</p>
-    </div>
-  );
+import { db } from "@/db";
+import { getAllTrades } from "@/trades/queries";
+import { DashboardClient } from "@/components/dashboard/dashboard-client";
+
+export const dynamic = "force-dynamic";
+
+export default async function DashboardPage() {
+  const trades = await getAllTrades(db);
+  return <DashboardClient trades={trades} />;
 }

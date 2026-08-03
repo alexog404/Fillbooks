@@ -1,0 +1,23 @@
+CREATE TABLE "trades" (
+	"id" text PRIMARY KEY NOT NULL,
+	"date" text NOT NULL,
+	"time" text NOT NULL,
+	"symbol" text NOT NULL,
+	"side" text NOT NULL,
+	"qty" numeric(14, 4) NOT NULL,
+	"entry" numeric(12, 4) NOT NULL,
+	"exit" numeric(12, 4) NOT NULL,
+	"pnl" numeric(12, 4) NOT NULL,
+	"r" numeric(10, 6),
+	"setup" text,
+	"duration_seconds" integer,
+	"status" text NOT NULL,
+	"has_note" boolean DEFAULT false NOT NULL,
+	"mistakes" text[] DEFAULT '{}' NOT NULL,
+	"habits" text[] DEFAULT '{}' NOT NULL,
+	"rating" integer,
+	"target" numeric(12, 4),
+	"stop" numeric(12, 4),
+	"mae" numeric(12, 4),
+	"mfe" numeric(12, 4)
+);
