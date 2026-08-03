@@ -76,6 +76,7 @@ export async function rebuildTradesForSymbol(db: Db, symbol: string): Promise<vo
       pnl: trade.netPnl ?? 0,
       durationSeconds: trade.closedAt ? Math.round((trade.closedAt.getTime() - trade.openedAt.getTime()) / 1000) : null,
       status: (trade.status === "closed" ? "closed" : "working") as "closed" | "working",
+      links: trade.links,
     };
   });
   const newIds = newRows.map((r) => r.id);
@@ -84,6 +85,7 @@ export async function rebuildTradesForSymbol(db: Db, symbol: string): Promise<vo
     const existing = await tx.select({ id: schema.trades.id }).from(schema.trades).where(eq(schema.trades.symbol, symbol));
     const staleIds = existing.map((r) => r.id).filter((id) => !newIds.includes(id));
     if (staleIds.length > 0) {
+      await tx.delete(schema.tradeExecutions).where(inArray(schema.tradeExecutions.tradeId, staleIds));
       await tx.delete(schema.trades).where(inArray(schema.trades.id, staleIds));
     }
 
@@ -104,6 +106,21 @@ export async function rebuildTradesForSymbol(db: Db, symbol: string): Promise<vo
             status: row.status,
           },
         });
+
+      // Links are cheap to fully replace rather than diff -- always the
+      // same shape derived fresh from this rebuild's FIFO match.
+      await tx.delete(schema.tradeExecutions).where(eq(schema.tradeExecutions.tradeId, row.id));
+      if (row.links.length > 0) {
+        await tx.insert(schema.tradeExecutions).values(
+          row.links.map((link) => ({
+            tradeId: row.id,
+            executionId: link.executionId,
+            role: link.role,
+            qtyApplied: link.qtyApplied,
+            price: link.price,
+          })),
+        );
+      }
     }
   });
 }

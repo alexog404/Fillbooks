@@ -97,7 +97,7 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
           {dayTrades.map((t) => (
             <Link
               key={t.id}
-              href={`/trades/${t.id}`}
+              href={`/trades/${t.id}?from=dashboard`}
               className="flex items-center justify-between px-2.5 py-2 rounded-md mb-1 bg-surface-2 hover:bg-surface-hover"
             >
               <div className="flex items-center gap-2">

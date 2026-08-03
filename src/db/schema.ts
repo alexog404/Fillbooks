@@ -62,6 +62,26 @@ export const trades = pgTable("trades", {
   stop: money("stop"),
   mae: money("mae"),
   mfe: money("mfe"),
+  notes: text("notes"),
+});
+
+// Links a trade back to the raw fills that make it up (for the Trade
+// Detail "Executions" tab) -- rebuilt alongside `trades` on every import,
+// same drop-and-recreate lifecycle, keyed off the trade id.
+export const tradeExecutions = pgTable("trade_executions", {
+  id: id(),
+  tradeId: text("trade_id").notNull(),
+  executionId: text("execution_id").notNull(),
+  role: text("role", { enum: ["entry", "exit"] }).notNull(),
+  qtyApplied: qty("qty_applied").notNull(),
+  price: money("price").notNull(),
+});
+
+// One row per calendar day -- Daily Journal's free-text note, independent
+// of any single trade.
+export const dailyNotes = pgTable("daily_notes", {
+  date: text("date").primaryKey(),
+  note: text("note").notNull().default(""),
 });
 
 // Raw fills from an imported CSV statement -- insert-once, deduped, never

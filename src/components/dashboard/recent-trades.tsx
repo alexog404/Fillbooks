@@ -21,7 +21,7 @@ export function RecentTrades({ trades }: { trades: Trade[] }) {
         return (
           <Link
             key={t.id}
-            href={`/trades/${t.id}`}
+            href={`/trades/${t.id}?from=dashboard`}
             className={`grid ${cols} gap-1 px-[9px] py-2 text-[10.5px] border-t border-border items-center hover:bg-surface-hover`}
           >
             <div className="text-text-secondary text-[8.5px]">{dateShort(t.date)}</div>
