@@ -57,42 +57,43 @@ export function AccountBalanceCard({
   }
 
   return (
-    <div
-      onMouseMove={onMouseMove}
-      onMouseLeave={() => setHoverIdx(null)}
-      className="flex-none w-[350px] rounded-xl px-5 py-4 flex flex-col justify-between relative overflow-hidden bg-background"
-    >
-      <svg
-        width="100%"
-        height="100%"
-        viewBox={`0 0 ${W} ${H}`}
-        preserveAspectRatio="none"
+    <div className="flex-none w-[350px] rounded-xl px-5 py-4 flex flex-col justify-between relative overflow-hidden bg-background">
+      <div
+        onMouseMove={onMouseMove}
+        onMouseLeave={() => setHoverIdx(null)}
         className="absolute inset-y-0 right-0 w-[75%]"
-        style={{
-          maskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent), linear-gradient(to bottom, black 70%, transparent)",
-          maskComposite: "intersect",
-          WebkitMaskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
-        }}
       >
-        <defs>
-          <linearGradient id="acctSparkGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--win)" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="var(--win)" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <polyline points={area} fill="url(#acctSparkGrad)" stroke="none" />
-        <polyline points={points} fill="none" stroke="var(--win)" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round" strokeOpacity="0.9" />
-        {hovering && (
-          <>
-            <line
-              x1="0" y1="0" x2="0" y2={H}
-              stroke="var(--text-muted)" strokeWidth="0.25" strokeDasharray="1.5,1.5"
-              style={{ transform: `translateX(${hoverX}px)`, transition: "transform 0.09s linear" }}
-            />
-            <circle cx={hoverX!} cy={hoverY!} r="1" fill="var(--win)" stroke="var(--background)" strokeWidth="0.5" style={{ transition: "cx 0.09s linear, cy 0.09s linear" }} />
-          </>
-        )}
-      </svg>
+        <svg
+          width="100%"
+          height="100%"
+          viewBox={`0 0 ${W} ${H}`}
+          preserveAspectRatio="none"
+          style={{
+            maskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent), linear-gradient(to bottom, black 70%, transparent)",
+            maskComposite: "intersect",
+            WebkitMaskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
+          }}
+        >
+          <defs>
+            <linearGradient id="acctSparkGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--win)" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="var(--win)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <polyline points={area} fill="url(#acctSparkGrad)" stroke="none" />
+          <polyline points={points} fill="none" stroke="var(--win)" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round" strokeOpacity="0.9" />
+          {hovering && (
+            <>
+              <line
+                x1="0" y1="0" x2="0" y2={H}
+                stroke="var(--text-muted)" strokeWidth="0.25" strokeDasharray="1.5,1.5"
+                style={{ transform: `translateX(${hoverX}px)`, transition: "transform 0.09s linear" }}
+              />
+              <circle cx={hoverX!} cy={hoverY!} r="1" fill="var(--win)" stroke="var(--background)" strokeWidth="0.5" style={{ transition: "cx 0.09s linear, cy 0.09s linear" }} />
+            </>
+          )}
+        </svg>
+      </div>
       <div className="relative">
         <div className="text-[11px] text-text-muted uppercase tracking-[0.04em]">Account Balance</div>
         <div className="text-[22px] font-extrabold font-mono tabular-nums mt-1">{displayText}</div>
