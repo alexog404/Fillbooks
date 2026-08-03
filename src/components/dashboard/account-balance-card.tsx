@@ -62,7 +62,18 @@ export function AccountBalanceCard({
       onMouseLeave={() => setHoverIdx(null)}
       className="flex-none w-[350px] rounded-xl px-5 py-4 flex flex-col justify-between relative overflow-hidden bg-background"
     >
-      <svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0">
+      <svg
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        className="absolute inset-0"
+        style={{
+          maskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent), linear-gradient(to bottom, black 70%, transparent)",
+          maskComposite: "intersect",
+          WebkitMaskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
+        }}
+      >
         <defs>
           <linearGradient id="acctSparkGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--win)" stopOpacity="0.85" />
