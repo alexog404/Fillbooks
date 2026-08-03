@@ -94,7 +94,7 @@ export function AccountBalanceCard({
           )}
         </svg>
       </div>
-      <div className="relative">
+      <div className="relative pointer-events-none">
         <div className="text-[11px] text-text-muted uppercase tracking-[0.04em]">Account Balance</div>
         <div className="text-[22px] font-extrabold font-mono tabular-nums mt-1">{displayText}</div>
         <div className="text-sm font-bold font-mono mt-0.5" style={{ color: displaySubColor }}>
