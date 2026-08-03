@@ -5,7 +5,7 @@ import { importCsv, type ImportResult } from "@/import/actions";
 
 const initialState: ImportResult | null = null;
 
-export function CsvImportCard() {
+export function CsvImportCard({ schwabConnected }: { schwabConnected: boolean }) {
   const [result, formAction, isPending] = useActionState(importCsv, initialState);
 
   return (
@@ -14,6 +14,12 @@ export function CsvImportCard() {
       <div className="text-[12.5px] text-text-muted mb-3.5">
         Upload a thinkorswim/Schwab statement export (CSV) to backfill trade history.
       </div>
+      {schwabConnected && (
+        <div className="text-[11.5px] mb-3.5 px-3 py-2 rounded-md" style={{ color: "var(--text-secondary)", background: "var(--surface-2)" }}>
+          Schwab is connected and syncing automatically — only import a CSV covering dates from{" "}
+          <em>before</em> that connection, to avoid the same fills showing up twice.
+        </div>
+      )}
       <form action={formAction} className="flex items-center gap-3 flex-wrap">
         <label className="px-[18px] py-2.5 rounded-lg bg-primary text-white text-[13px] font-bold cursor-pointer">
           {isPending ? "Importing…" : "Choose CSV file"}

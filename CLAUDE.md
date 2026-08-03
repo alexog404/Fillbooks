@@ -237,6 +237,30 @@ once" section — this is the condensed, forward-looking version.
     and the call itself must be `await`ed — there's no synchronous
     transaction API like better-sqlite3 had.
 
+## CSV import vs. Schwab sync: don't let their date ranges overlap
+
+This project has two ways fills get into `executions`: manual CSV statement
+import (built, working) and Schwab API sync (pending Schwab's app
+approval). Both dedupe on the same exact hash — `sha256(date|time|symbol|
+side|qty|price)` — checked via a unique constraint before insert.
+
+**That hash match is not guaranteed across the two sources.** CSV import
+derives date/time from the statement's printed "M/D/YY H:MM:SS" text;
+Schwab's API will return its own timestamp representation that has to be
+converted to match. Any difference — rounding, a few seconds of drift,
+different decimal precision — means the same real fill silently becomes
+two separate trades instead of deduping. This is the same class of problem
+the predecessor project hit and explicitly left unsolved (CSV-imported and
+API-synced data for the same account never fully reconciled there either).
+
+**Decision: don't build around it — keep the two sources' date ranges from
+ever overlapping instead.** CSV import is for backfilling history from
+before Schwab access existed. Once Schwab sync is live, don't re-import a
+CSV that covers dates Schwab already synced. This is a usage discipline,
+not a technical safeguard — there's no code enforcing it. If a future
+session is asked to reconcile overlapping CSV + Schwab data, that's new
+work, not something already handled.
+
 ## Commands (once the project is scaffolded)
 
 ```bash

@@ -35,7 +35,7 @@ export default async function SettingsPage({
 
       <BrokerConnectionCard connection={connection} state={state} />
 
-      <CsvImportCard />
+      <CsvImportCard schwabConnected={state === "connected"} />
 
       <div className="bg-surface border border-border rounded-[10px] px-5 py-[18px]">
         <div className="text-[15px] font-bold mb-3.5">Display</div>
