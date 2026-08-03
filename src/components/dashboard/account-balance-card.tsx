@@ -67,7 +67,7 @@ export function AccountBalanceCard({
         height="100%"
         viewBox={`0 0 ${W} ${H}`}
         preserveAspectRatio="none"
-        className="absolute inset-0"
+        className="absolute inset-y-0 right-0 w-[75%]"
         style={{
           maskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent), linear-gradient(to bottom, black 70%, transparent)",
           maskComposite: "intersect",
@@ -95,7 +95,7 @@ export function AccountBalanceCard({
       </svg>
       <div className="relative">
         <div className="text-[11px] text-text-muted uppercase tracking-[0.04em]">Account Balance</div>
-        <div className="text-[30px] font-extrabold font-mono tabular-nums mt-1">{displayText}</div>
+        <div className="text-[22px] font-extrabold font-mono tabular-nums mt-1">{displayText}</div>
         <div className="text-sm font-bold font-mono mt-0.5" style={{ color: displaySubColor }}>
           {displaySub}
           {hovering && dates[hoverIdx!] && <span className="text-text-muted font-normal ml-1">· {dateShort(dates[hoverIdx!]!)}</span>}
