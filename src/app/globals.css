@@ -154,6 +154,27 @@
   --sidebar-ring: #8b5cf6;
 }
 
+/* Colorblind-safe palette (blue/orange instead of green/red) -- P&L is
+   this app's most important signal, so this only swaps win/loss-adjacent
+   tokens, never the base surface/text scale. Combined-class selectors
+   (not source order) are what make these win over plain .dark/:root. */
+.colorblind {
+  --win: #1d4ed8;
+  --win-soft: rgba(29, 78, 216, 0.10);
+  --loss: #c2410c;
+  --loss-soft: rgba(194, 65, 12, 0.10);
+  --chart-up: #1d4ed8;
+  --chart-down: #c2410c;
+}
+.dark.colorblind {
+  --win: #3b82f6;
+  --win-soft: rgba(59, 130, 246, 0.16);
+  --loss: #f97316;
+  --loss-soft: rgba(249, 115, 22, 0.16);
+  --chart-up: #3b82f6;
+  --chart-down: #f97316;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

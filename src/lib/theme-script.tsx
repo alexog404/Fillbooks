@@ -7,6 +7,8 @@ const THEME_SCRIPT = `
     var theme = localStorage.getItem('fillbooks-theme') || 'dark';
     if (theme === 'dark') document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
+    var cb = localStorage.getItem('fillbooks-colorblind') === '1';
+    if (cb) document.documentElement.classList.add('colorblind');
   } catch (e) {}
 })();
 `;
