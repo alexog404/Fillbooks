@@ -42,7 +42,7 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
         <div className="text-[11px] text-text-muted">Click a day with trades for detail</div>
       </div>
 
-      <div className="relative">
+      <div className="relative isolate">
         <div
           className="absolute -right-px -top-[3px] -bottom-[3px] rounded-lg pointer-events-none z-0 border-[1.5px]"
           style={{ width: "calc((100% - 42px)/8 + 2px)", borderColor: "var(--primary)", background: "var(--accent-soft)" }}
