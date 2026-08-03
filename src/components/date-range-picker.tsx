@@ -45,7 +45,7 @@ export function DateRangePicker({
 
   return (
     <div
-      className="absolute top-9 z-10 bg-surface border border-border rounded-[10px] p-3 shadow-[0_8px_24px_rgba(0,0,0,0.35)] w-[230px]"
+      className="absolute top-9 z-10 bg-surface border border-border rounded-[10px] p-3 shadow-[0_8px_24px_rgba(0,0,0,0.35)] w-[230px] select-none"
       style={{ [align === "left" ? "left" : "right"]: 0 }}
     >
       <div className="text-[9.5px] text-text-muted mb-1.5">Click a day, then another to set a range</div>
