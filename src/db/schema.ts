@@ -84,10 +84,10 @@ export const dailyNotes = pgTable("daily_notes", {
   note: text("note").notNull().default(""),
 });
 
-// Raw fills from an imported CSV statement -- insert-once, deduped, never
-// mutated. `trades` is fully derived from these (rebuild.ts drops and
-// re-derives per symbol), so re-importing an overlapping statement can't
-// double-count: the dedupe hash is checked before insert, not after.
+// Raw fills synced from the broker -- insert-once, deduped, never mutated.
+// `trades` is fully derived from these (rebuild.ts drops and re-derives per
+// symbol), so re-syncing an overlapping window can't double-count: the
+// dedupe hash is checked before insert, not after.
 export const executions = pgTable(
   "executions",
   {

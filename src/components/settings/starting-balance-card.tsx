@@ -13,8 +13,8 @@ export function StartingBalanceCard({ startingBalance }: { startingBalance: numb
       <div className="text-[18px] font-bold mb-2.5">Starting balance</div>
       <div className="text-[15.5px] text-text-muted mb-3.5">
         {startingBalance === null
-          ? "Not set yet -- import a CSV statement to auto-estimate it, or enter it directly."
-          : "Auto-estimated from your last import's ending balance minus everything since. Deposits, withdrawals, and untracked fees make this an estimate -- adjust it if it looks off."}
+          ? "Not set yet -- enter your account balance directly."
+          : "Deposits, withdrawals, and untracked fees mean this can drift from your broker's real balance -- adjust it if it looks off."}
       </div>
       <form action={formAction} className="flex items-center gap-3 flex-wrap">
         <input

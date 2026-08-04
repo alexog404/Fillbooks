@@ -66,8 +66,8 @@ export interface RStat {
 }
 
 /** Only trades with a real R (target/stop set on Trade Detail) count --
- * CSV-imported trades start with none, so this can legitimately be empty
- * for a while. Returns null rather than misleading zeros in that case. */
+ * a freshly-synced trade starts with neither, so this can legitimately be
+ * empty for a while. Returns null rather than misleading zeros in that case. */
 export function rMultipleStats(trades: Trade[]): RStat[] | null {
   const rVals = trades.map((t) => t.r).filter((r): r is number => r != null);
   if (rVals.length === 0) return null;

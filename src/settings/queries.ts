@@ -15,12 +15,3 @@ export async function setStartingBalance(db: Db, value: number): Promise<void> {
     .values({ id: ROW_ID, startingBalance: value })
     .onConflictDoUpdate({ target: schema.appSettings.id, set: { startingBalance: value } });
 }
-
-/** Only sets the value if unset -- used right after an import so a second,
- * later import doesn't clobber a balance the user may have since edited. */
-export async function setStartingBalanceIfUnset(db: Db, value: number): Promise<void> {
-  const existing = await getStartingBalance(db);
-  if (existing === null) {
-    await setStartingBalance(db, value);
-  }
-}
