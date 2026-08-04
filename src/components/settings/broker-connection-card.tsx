@@ -1,6 +1,7 @@
 import type { BrokerConnection } from "@/schwab/connectionQueries";
 import type { BrokerDisplayState } from "@/schwab/connectionDisplay";
 import { disconnectSchwab } from "@/schwab/actions";
+import { SyncNowButton } from "./sync-now-button";
 
 function fmtEt(d: Date | null): string {
   if (!d) return "—";
@@ -63,14 +64,7 @@ export function BrokerConnectionCard({ connection, state }: { connection: Broker
         )}
         {state === "connected" && (
           <>
-            <button
-              type="button"
-              disabled
-              title="Sync logic isn't built yet -- coming in a future feature"
-              className="px-[18px] py-2.5 rounded-lg bg-surface-2 border border-border text-text-muted text-[16px] font-semibold cursor-not-allowed opacity-60"
-            >
-              Sync now
-            </button>
+            <SyncNowButton />
             <form action={disconnectSchwab}>
               <button type="submit" className="px-[18px] py-2.5 rounded-lg bg-transparent border border-border text-text-muted text-[16px] font-semibold cursor-pointer">
                 Disconnect
