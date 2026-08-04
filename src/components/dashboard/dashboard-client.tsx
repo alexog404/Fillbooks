@@ -6,7 +6,7 @@ import { AccountBalanceCard } from "./account-balance-card";
 import { KpiCards } from "./kpi-cards";
 import { PnlCalendar } from "./pnl-calendar";
 import { RecentTrades } from "./recent-trades";
-import { DailyPnlChart } from "./daily-pnl-chart";
+import { MonthlyPnlChart } from "./monthly-pnl-chart";
 import { fmtDay, fmtLocal, fridayOf, mondayOf, type Trade } from "@/lib/trades";
 
 export function DashboardClient({ trades, startingBalance }: { trades: Trade[]; startingBalance: number }) {
@@ -76,7 +76,7 @@ export function DashboardClient({ trades, startingBalance }: { trades: Trade[]; 
             <PnlCalendar trades={trades} startingBalance={startingBalance} initialMonthKey={weekStart.slice(0, 7)} />
             <RecentTrades trades={weekTrades} />
           </div>
-          <DailyPnlChart trades={monthTrades} />
+          <MonthlyPnlChart trades={monthTrades} monthKey={currentMonthKey} />
         </>
       )}
     </div>

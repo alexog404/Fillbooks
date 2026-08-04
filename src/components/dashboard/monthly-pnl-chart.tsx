@@ -1,6 +1,17 @@
 import { dateShort, money, pnlColorVar, type Trade } from "@/lib/trades";
 
-export function DailyPnlChart({ trades }: { trades: Trade[] }) {
+/** "YYYY-MM" -> every calendar date in that month, "YYYY-MM-DD". Untraded
+ * days still get a slot (zero-height bar) -- without this, a month with
+ * only one trading day renders as a single bar spanning the full chart
+ * width, which reads as a much bigger move than it is. */
+function daysInMonth(monthKey: string): string[] {
+  const [year, month] = monthKey.split("-").map(Number);
+  const count = new Date(year, month, 0).getDate();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return Array.from({ length: count }, (_, i) => `${year}-${pad(month)}-${pad(i + 1)}`);
+}
+
+export function MonthlyPnlChart({ trades, monthKey }: { trades: Trade[]; monthKey: string }) {
   const sortedByDate = [...trades].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   let cum = 0;
   const eqVals = sortedByDate.map((t) => (cum += t.pnl));
@@ -10,24 +21,15 @@ export function DailyPnlChart({ trades }: { trades: Trade[] }) {
   trades.forEach((t) => {
     dayMap[t.date] = (dayMap[t.date] || 0) + t.pnl;
   });
-  const dayDates = Object.keys(dayMap).sort();
+  const dayDates = daysInMonth(monthKey);
 
-  if (dayDates.length === 0) {
-    return (
-      <div className="bg-surface border border-border rounded-[10px] px-[18px] py-4">
-        <div className="text-[16px] font-bold mb-2">Monthly P&amp;L — Win vs Loss Days</div>
-        <div className="h-[210px] flex items-center justify-center text-[17px] text-text-muted">No trades yet.</div>
-      </div>
-    );
-  }
-
-  const dayVals = dayDates.map((d) => dayMap[d]);
+  const dayVals = dayDates.map((d) => dayMap[d] ?? 0);
   const dayAbsMax = Math.max(...dayVals.map((v) => Math.abs(v)), 100);
   const chartW = 560, chartH = 210, baseY = chartH / 2;
   const barSlot = chartW / dayVals.length;
-  const barW = Math.max(barSlot * 0.55, 6);
+  const barW = Math.max(barSlot * 0.55, 3);
   const dayBars = dayDates.map((d, i) => {
-    const v = dayMap[d];
+    const v = dayMap[d] ?? 0;
     const h = (Math.abs(v) / dayAbsMax) * (chartH / 2 - 10);
     const x = i * barSlot + (barSlot - barW) / 2;
     return { x, y: v >= 0 ? baseY - h : baseY, w: barW, h, color: pnlColorVar(v) };
@@ -36,7 +38,7 @@ export function DailyPnlChart({ trades }: { trades: Trade[] }) {
     const val = dayAbsMax - f * dayAbsMax * 2;
     return { y: f * chartH, label: (val >= 0 ? "$" : "-$") + Math.abs(Math.round(val)).toLocaleString() };
   });
-  const xIdxD = [0, Math.floor((dayDates.length - 1) * 0.4), Math.floor((dayDates.length - 1) * 0.7), dayDates.length - 1];
+  const xIdxD = [0, Math.floor((dayDates.length - 1) * 0.25), Math.floor((dayDates.length - 1) * 0.5), Math.floor((dayDates.length - 1) * 0.75), dayDates.length - 1];
   const eqXLabels = [...new Set(xIdxD)].map((i) => ({ x: (((i * barSlot + barSlot / 2) / chartW) * 100).toFixed(1) + "%", label: dateShort(dayDates[i]) }));
 
   return (
@@ -58,7 +60,7 @@ export function DailyPnlChart({ trades }: { trades: Trade[] }) {
             ))}
             <line x1="0" y1={baseY} x2={chartW} y2={baseY} stroke="var(--border)" strokeWidth="1" />
             {dayBars.map((bar, i) => (
-              <rect key={i} x={bar.x} y={bar.y} width={bar.w} height={bar.h} fill={bar.color} rx="2" />
+              bar.h > 0 && <rect key={i} x={bar.x} y={bar.y} width={bar.w} height={bar.h} fill={bar.color} rx="1.5" />
             ))}
           </svg>
           <div className="relative h-4">
