@@ -62,12 +62,18 @@ interface BoxRect {
 }
 
 /** `timeToCoordinate` only resolves timestamps that land exactly on a
- * plotted bar -- an execution's real fill time (e.g. :31 seconds into a
- * 1-minute bar) isn't one, and silently returns null. Bucket it onto the
- * same boundary `aggregate` used to build the currently-displayed bars. */
-function floorToBucket(d: Date, minutes: number): Date {
-  const bucketMs = minutes * 60_000;
-  return new Date(Math.floor(d.getTime() / bucketMs) * bucketMs);
+ * plotted bar -- an execution's real fill time (seconds into a bar, or a
+ * thinly-traded minute Alpaca has no bar for at all) is often not one, and
+ * silently returns null. `displayBars` is chronologically sorted; this
+ * finds the last bar at or before `target`, falling back to the first bar
+ * if the target precedes everything. */
+function nearestBarTime(displayBars: Bar[], target: Date): Date {
+  let result = displayBars[0].time;
+  for (const b of displayBars) {
+    if (b.time.getTime() <= target.getTime()) result = b.time;
+    else break;
+  }
+  return result;
 }
 
 /** Client-side 5m/15m aggregation from the cached 1m bars -- no extra
@@ -175,8 +181,8 @@ export function TradeChart({ bars, executions, date, entry, exit, pnl, qty, stat
         setBox(null);
         return;
       }
-      const x1 = chart.timeScale().timeToCoordinate(toUtcTimestamp(floorToBucket(entryTime, timeframe)));
-      const x2 = chart.timeScale().timeToCoordinate(toUtcTimestamp(floorToBucket(exitTime, timeframe)));
+      const x1 = chart.timeScale().timeToCoordinate(toUtcTimestamp(nearestBarTime(displayBars, entryTime)));
+      const x2 = chart.timeScale().timeToCoordinate(toUtcTimestamp(nearestBarTime(displayBars, exitTime)));
       const yEntry = series.priceToCoordinate(entry);
       const yExit = series.priceToCoordinate(exit);
       if (x1 == null || x2 == null || yEntry == null || yExit == null) {
