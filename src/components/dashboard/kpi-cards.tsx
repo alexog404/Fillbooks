@@ -10,14 +10,14 @@ function mkArc(a1: number, a2: number, r: number): string {
   return `M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 0,1 ${x2.toFixed(1)},${y2.toFixed(1)}`;
 }
 
-export function KpiCards({ weekTrades, allTrades }: { weekTrades: Trade[]; allTrades: Trade[] }) {
-  const kpis = computeKpis(weekTrades);
-  const grossWin = weekTrades.filter((t) => t.pnl > 0).reduce((s, t) => s + t.pnl, 0);
-  const grossLoss = Math.abs(weekTrades.filter((t) => t.pnl < 0).reduce((s, t) => s + t.pnl, 0));
+export function KpiCards({ trades }: { trades: Trade[] }) {
+  const kpis = computeKpis(trades);
+  const grossWin = trades.filter((t) => t.pnl > 0).reduce((s, t) => s + t.pnl, 0);
+  const grossLoss = Math.abs(trades.filter((t) => t.pnl < 0).reduce((s, t) => s + t.pnl, 0));
   const pfShare = grossWin + grossLoss ? (grossWin / (grossWin + grossLoss)) * 100 : 50;
   const pfCirc = 2 * Math.PI * 24;
 
-  const beCount = weekTrades.filter((t) => t.pnl === 0).length;
+  const beCount = trades.filter((t) => t.pnl === 0).length;
   const wTot = Math.max(kpis.winCount + beCount + kpis.lossCount, 1);
   const winFrac = kpis.winCount / wTot, beFrac = beCount / wTot, lossFrac = kpis.lossCount / wTot;
   const aWinEnd = 180 - winFrac * 180, aBeEnd = aWinEnd - beFrac * 180, aLossEnd = aBeEnd - lossFrac * 180;
@@ -26,7 +26,7 @@ export function KpiCards({ weekTrades, allTrades }: { weekTrades: Trade[]; allTr
   const winLossRatio = Math.abs(kpis.avgLoss) ? kpis.avgWin / Math.abs(kpis.avgLoss) : kpis.avgWin > 0 ? 99 : 0;
   const wlShare = kpis.avgWin + Math.abs(kpis.avgLoss) ? (kpis.avgWin / (kpis.avgWin + Math.abs(kpis.avgLoss))) * 100 : 50;
 
-  const rSorted = [...allTrades].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const rSorted = [...trades].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   const rSeries = rSorted.map((t) => t.r ?? 0);
   const avgR = rSeries.length ? rSeries.reduce((s, v) => s + v, 0) / rSeries.length : 0;
   const rMin = Math.min(...rSeries, 0), rMax = Math.max(...rSeries, 0), rRg = rMax - rMin || 1;

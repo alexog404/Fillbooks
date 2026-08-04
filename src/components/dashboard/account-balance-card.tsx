@@ -6,13 +6,9 @@ import { dateShort, type Trade } from "@/lib/trades";
 export function AccountBalanceCard({
   trades,
   startingBalance,
-  weekStartBalance,
-  weekPnlSum,
 }: {
   trades: Trade[];
   startingBalance: number;
-  weekStartBalance: number;
-  weekPnlSum: number;
 }) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 
@@ -35,19 +31,21 @@ export function AccountBalanceCard({
   const hoverX = hovering ? hoverIdx! * stepX : null;
   const hoverY = hovering ? toY(series[hoverIdx!]) : null;
 
-  const weekPct = weekStartBalance ? (weekPnlSum / weekStartBalance) * 100 : 0;
-  const weekPctText = (weekPct >= 0 ? "+" : "") + weekPct.toFixed(2) + "%";
-  const weekPctColor = weekPct >= 0 ? "var(--win)" : "var(--loss)";
+  // Lifetime total return, not a selected-week figure -- this card holds
+  // steady regardless of any date-range picker elsewhere on the dashboard.
+  const totalPct = startingBalance ? ((balance - startingBalance) / startingBalance) * 100 : 0;
+  const totalPctText = (totalPct >= 0 ? "+" : "") + totalPct.toFixed(2) + "%";
+  const totalPctColor = totalPct >= 0 ? "var(--win)" : "var(--loss)";
 
-  const hoverPct = hovering && weekStartBalance ? ((series[hoverIdx!] - weekStartBalance) / weekStartBalance) * 100 : null;
+  const hoverPct = hovering && startingBalance ? ((series[hoverIdx!] - startingBalance) / startingBalance) * 100 : null;
   const hoverPctText = hoverPct != null ? (hoverPct >= 0 ? "+" : "") + hoverPct.toFixed(2) + "%" : null;
   const hoverPctColor = hoverPct != null ? (hoverPct >= 0 ? "var(--win)" : "var(--loss)") : null;
 
   const displayText = hovering
     ? "$" + series[hoverIdx!].toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
     : "$" + balance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  const displaySub = hovering ? hoverPctText : weekPctText;
-  const displaySubColor = hovering ? hoverPctColor! : weekPctColor;
+  const displaySub = hovering ? hoverPctText : totalPctText;
+  const displaySubColor = hovering ? hoverPctColor! : totalPctColor;
 
   function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();

@@ -19,11 +19,11 @@ export function DashboardClient({ trades, startingBalance }: { trades: Trade[]; 
   const [weekEnd, setWeekEnd] = useState(fridayOf(defaultWeekStart));
 
   const weekTrades = trades.filter((t) => t.date >= weekStart && t.date <= weekEnd);
-  const beforeWeekPnl = trades.filter((t) => t.date < weekStart).reduce((s, t) => s + t.pnl, 0);
-  const weekStartBalance = startingBalance + beforeWeekPnl;
-  const weekPnlSum = weekTrades.reduce((s, t) => s + t.pnl, 0);
 
   const weekLabel = fmtDay(weekStart) + " – " + fmtDay(weekEnd);
+
+  const currentMonthKey = fmtLocal(new Date()).slice(0, 7);
+  const monthTrades = trades.filter((t) => t.date.slice(0, 7) === currentMonthKey);
 
   return (
     <div className="px-7 pt-6 pb-10">
@@ -58,7 +58,7 @@ export function DashboardClient({ trades, startingBalance }: { trades: Trade[]; 
             <div className="text-[15px] px-3 py-1.5 rounded-md bg-surface-2 border border-border text-text-secondary">Cash · Schwab</div>
           </div>
         </div>
-        <AccountBalanceCard trades={trades} startingBalance={startingBalance} weekStartBalance={weekStartBalance} weekPnlSum={weekPnlSum} />
+        <AccountBalanceCard trades={trades} startingBalance={startingBalance} />
       </div>
 
       {trades.length === 0 ? (
@@ -71,12 +71,12 @@ export function DashboardClient({ trades, startingBalance }: { trades: Trade[]; 
         </div>
       ) : (
         <>
-          <KpiCards weekTrades={weekTrades} allTrades={trades} />
+          <KpiCards trades={trades} />
           <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: "1.75fr 1fr" }}>
             <PnlCalendar trades={trades} startingBalance={startingBalance} initialMonthKey={weekStart.slice(0, 7)} />
             <RecentTrades trades={weekTrades} />
           </div>
-          <DailyPnlChart trades={trades} />
+          <DailyPnlChart trades={monthTrades} />
         </>
       )}
     </div>
