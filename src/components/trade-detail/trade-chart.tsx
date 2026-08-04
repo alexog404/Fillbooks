@@ -4,19 +4,23 @@ import { useEffect, useRef, useState } from "react";
 import {
   CandlestickSeries,
   CrosshairMode,
+  LineStyle,
   createChart,
-  createSeriesMarkers,
   type MouseEventParams,
-  type SeriesMarker,
-  type Time,
   type UTCTimestamp,
 } from "lightweight-charts";
 import type { Bar } from "@/market-data/provider";
 import type { TradeExecutionRow } from "@/trades/queries";
+import { money } from "@/lib/trades";
 
 export interface TradeChartProps {
   bars: Bar[];
   executions: TradeExecutionRow[];
+  entry: number;
+  exit: number;
+  pnl: number;
+  qty: number;
+  status: "closed" | "working" | "cancelled";
 }
 
 function toUtcTimestamp(d: Date): UTCTimestamp {
@@ -27,11 +31,28 @@ function cssVar(name: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
+/** `time` ("HH:MM:SS") anchored onto the calendar day of `dayBase`, same
+ * convention as the old marker code -- executions only ever carry a plain
+ * time-of-day string, never their own date. */
+function timeOnDay(dayBase: Date, time: string): Date {
+  const [h, m, s] = time.split(":").map(Number);
+  const d = new Date(dayBase);
+  d.setHours(h, m, s, 0);
+  return d;
+}
+
 interface Hovered {
   o: number;
   h: number;
   l: number;
   c: number;
+}
+
+interface BoxRect {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
 }
 
 /** Client-side 5m/15m aggregation from the cached 1m bars -- no extra
@@ -58,10 +79,15 @@ function aggregate(bars: Bar[], minutes: number): Bar[] {
     }));
 }
 
-export function TradeChart({ bars, executions }: TradeChartProps) {
+export function TradeChart({ bars, executions, entry, exit, pnl, qty, status }: TradeChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [timeframe, setTimeframe] = useState<1 | 5 | 15>(1);
   const [hovered, setHovered] = useState<Hovered | null>(null);
+  const [box, setBox] = useState<BoxRect | null>(null);
+
+  const isClosed = status === "closed";
+  const isWin = pnl >= 0;
+  const zoneColor = isWin ? "var(--win)" : "var(--loss)";
 
   useEffect(() => {
     const container = containerRef.current;
@@ -95,21 +121,64 @@ export function TradeChart({ bars, executions }: TradeChartProps) {
       displayBars.map((b) => ({ time: toUtcTimestamp(b.time), open: b.open, high: b.high, low: b.low, close: b.close })),
     );
 
-    const seriesMarkers: SeriesMarker<Time>[] = executions.map((e) => {
-      const [h, m, s] = e.time.split(":").map(Number);
-      const t = new Date(bars[0].time);
-      t.setHours(h, m, s, 0);
-      return {
-        time: toUtcTimestamp(t),
-        position: e.role === "entry" ? "belowBar" : "aboveBar",
-        shape: e.role === "entry" ? "arrowUp" : "arrowDown",
-        color: e.side === "buy" ? win : loss,
-        text: `${e.role === "entry" ? "Entry" : "Exit"} ${e.price.toFixed(2)}`,
-      };
-    });
-    createSeriesMarkers(series, seriesMarkers);
+    const dayBase = bars[0].time;
+    const entryRow = executions.find((e) => e.role === "entry");
+    const exitRows = executions.filter((e) => e.role === "exit");
+    const lastExitRow = isClosed && exitRows.length > 0 ? exitRows[exitRows.length - 1] : null;
 
-    chart.timeScale().fitContent();
+    const entryTime = entryRow ? timeOnDay(dayBase, entryRow.time) : null;
+    const exitTime = lastExitRow ? timeOnDay(dayBase, lastExitRow.time) : null;
+
+    if (entryTime) {
+      series.createPriceLine({ price: entry, color: win, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true, title: "Entry" });
+    }
+    if (exitTime) {
+      series.createPriceLine({ price: exit, color: isWin ? win : loss, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true, title: "Exit" });
+    }
+
+    // Default to a window padded around the trade itself, not the whole
+    // session -- fitContent() on a full 390-bar day made short trades a
+    // sliver a few pixels wide, with markers overlapping and unreadable.
+    const barTimes = displayBars.map((b) => b.time.getTime());
+    const dataStart = barTimes[0];
+    const dataEnd = barTimes[barTimes.length - 1];
+    const windowStart = entryTime ? entryTime.getTime() : dataStart;
+    const windowEnd = exitTime ? exitTime.getTime() : entryTime ? entryTime.getTime() : dataEnd;
+    const durationMin = Math.max(1, (windowEnd - windowStart) / 60_000);
+    const padMs = Math.min(60, Math.max(8, Math.round(durationMin * 0.7))) * 60_000;
+    const from = Math.max(dataStart, windowStart - padMs);
+    const to = Math.min(dataEnd, windowEnd + padMs);
+    if (from < to) {
+      chart.timeScale().setVisibleRange({ from: toUtcTimestamp(new Date(from)), to: toUtcTimestamp(new Date(to)) });
+    } else {
+      chart.timeScale().fitContent();
+    }
+
+    function renderBox() {
+      if (!entryTime || !exitTime) {
+        setBox(null);
+        return;
+      }
+      const x1 = chart.timeScale().timeToCoordinate(toUtcTimestamp(entryTime));
+      const x2 = chart.timeScale().timeToCoordinate(toUtcTimestamp(exitTime));
+      const yEntry = series.priceToCoordinate(entry);
+      const yExit = series.priceToCoordinate(exit);
+      if (x1 == null || x2 == null || yEntry == null || yExit == null) {
+        setBox(null);
+        return;
+      }
+      setBox({
+        left: Math.min(x1, x2),
+        top: Math.min(yEntry, yExit),
+        width: Math.max(2, Math.abs(x2 - x1)),
+        height: Math.max(2, Math.abs(yExit - yEntry)),
+      });
+    }
+
+    renderBox();
+    chart.timeScale().subscribeVisibleLogicalRangeChange(renderBox);
+    const resizeObserver = new ResizeObserver(renderBox);
+    resizeObserver.observe(container);
 
     function handleCrosshairMove(param: MouseEventParams) {
       const point = param.seriesData.get(series);
@@ -122,10 +191,12 @@ export function TradeChart({ bars, executions }: TradeChartProps) {
     chart.subscribeCrosshairMove(handleCrosshairMove);
 
     return () => {
+      resizeObserver.disconnect();
+      chart.timeScale().unsubscribeVisibleLogicalRangeChange(renderBox);
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       chart.remove();
     };
-  }, [bars, executions, timeframe]);
+  }, [bars, executions, entry, exit, isClosed, isWin, timeframe]);
 
   if (bars.length === 0) {
     return (
@@ -166,7 +237,29 @@ export function TradeChart({ bars, executions }: TradeChartProps) {
           </div>
         )}
       </div>
-      <div ref={containerRef} className="h-[300px] w-full" />
+      <div className="relative h-[300px] w-full">
+        <div ref={containerRef} className="absolute inset-0" />
+        {box && (
+          <div
+            className="absolute pointer-events-none rounded-[2px]"
+            style={{
+              left: box.left,
+              top: box.top,
+              width: box.width,
+              height: box.height,
+              background: `color-mix(in srgb, ${zoneColor} 16%, transparent)`,
+              border: `1px solid ${zoneColor}`,
+            }}
+          >
+            <div
+              className="absolute -top-[23px] left-1 whitespace-nowrap rounded px-1.5 py-0.5 text-[11.5px] font-mono font-semibold"
+              style={{ background: "var(--surface-2)", border: "1px solid var(--border)", color: zoneColor }}
+            >
+              {money(pnl, true)} · {qty} sh
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -142,7 +142,7 @@ export function TradeDetailClient({
         </div>
 
         <div className="flex flex-col gap-3 min-w-0">
-          <TradeChart bars={bars} executions={executions} />
+          <TradeChart bars={bars} executions={executions} entry={trade.entry} exit={trade.exit} pnl={trade.pnl} qty={trade.qty} status={trade.status} />
 
           <div className="bg-surface border border-border rounded-[10px]">
             <div className="flex gap-1 px-3.5 pt-2.5 border-b border-border">
