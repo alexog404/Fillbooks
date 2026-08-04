@@ -200,10 +200,24 @@ export function TradeChart({ bars, executions, date, entry, exit, pnl, qty, stat
     // `autoSize` fits the chart to `container` via ResizeObserver, which
     // fires *after* this synchronous setup runs -- calling setVisibleRange
     // or reading coordinates before that first resize lands silently no-ops
-    // against a zero-width chart. Deferring a frame lets that resize settle.
+    // against a zero-width chart. Worse, the right price scale's autoscale
+    // recomputes off the visible range on its own paint cycle, a tick
+    // behind the logical-range-change event that's supposed to signal it's
+    // ready -- a single read after that event can still land on the *old*
+    // (whole-session) price scale. Polling a handful of frames is a cheap,
+    // reliable way to land on the settled values without depending on
+    // exactly which internal tick they land on.
+    let cancelled = false;
+    let framesLeft = 10;
+    function pollRenderBox() {
+      if (cancelled) return;
+      renderBox();
+      framesLeft--;
+      if (framesLeft > 0) requestAnimationFrame(pollRenderBox);
+    }
     const raf = requestAnimationFrame(() => {
       applyDefaultWindow();
-      renderBox();
+      pollRenderBox();
     });
     chart.timeScale().subscribeVisibleLogicalRangeChange(renderBox);
     const resizeObserver = new ResizeObserver(renderBox);
@@ -220,6 +234,7 @@ export function TradeChart({ bars, executions, date, entry, exit, pnl, qty, stat
     chart.subscribeCrosshairMove(handleCrosshairMove);
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(raf);
       resizeObserver.disconnect();
       chart.timeScale().unsubscribeVisibleLogicalRangeChange(renderBox);
