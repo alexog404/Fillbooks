@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { fromZonedTime } from "date-fns-tz";
 import {
   CandlestickSeries,
   CrosshairMode,
@@ -13,9 +14,12 @@ import type { Bar } from "@/market-data/provider";
 import type { TradeExecutionRow } from "@/trades/queries";
 import { money } from "@/lib/trades";
 
+const MARKET_ZONE = "America/New_York";
+
 export interface TradeChartProps {
   bars: Bar[];
   executions: TradeExecutionRow[];
+  date: string;
   entry: number;
   exit: number;
   pnl: number;
@@ -31,14 +35,16 @@ function cssVar(name: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-/** `time` ("HH:MM:SS") anchored onto the calendar day of `dayBase`, same
- * convention as the old marker code -- executions only ever carry a plain
- * time-of-day string, never their own date. */
-function timeOnDay(dayBase: Date, time: string): Date {
+/** `date` ("Y-M-D") + `time` ("HH:MM:SS") are both plain ET strings (see
+ * CLAUDE.md's timezone trap) -- built via the *local* Date constructor,
+ * never `Date.UTC`, then converted assuming ET wall-clock via
+ * `fromZonedTime`. Using the browser's own local timezone here (e.g. via
+ * `.setHours()` on a UTC instant) silently produces the wrong instant
+ * whenever the browser isn't in US Eastern time. */
+function etTimeToUtc(date: string, time: string): Date {
+  const [year, month, day] = date.split("-").map(Number);
   const [h, m, s] = time.split(":").map(Number);
-  const d = new Date(dayBase);
-  d.setHours(h, m, s, 0);
-  return d;
+  return fromZonedTime(new Date(year, month - 1, day, h, m, s), MARKET_ZONE);
 }
 
 interface Hovered {
@@ -79,7 +85,7 @@ function aggregate(bars: Bar[], minutes: number): Bar[] {
     }));
 }
 
-export function TradeChart({ bars, executions, entry, exit, pnl, qty, status }: TradeChartProps) {
+export function TradeChart({ bars, executions, date, entry, exit, pnl, qty, status }: TradeChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [timeframe, setTimeframe] = useState<1 | 5 | 15>(1);
   const [hovered, setHovered] = useState<Hovered | null>(null);
@@ -121,13 +127,12 @@ export function TradeChart({ bars, executions, entry, exit, pnl, qty, status }: 
       displayBars.map((b) => ({ time: toUtcTimestamp(b.time), open: b.open, high: b.high, low: b.low, close: b.close })),
     );
 
-    const dayBase = bars[0].time;
     const entryRow = executions.find((e) => e.role === "entry");
     const exitRows = executions.filter((e) => e.role === "exit");
     const lastExitRow = isClosed && exitRows.length > 0 ? exitRows[exitRows.length - 1] : null;
 
-    const entryTime = entryRow ? timeOnDay(dayBase, entryRow.time) : null;
-    const exitTime = lastExitRow ? timeOnDay(dayBase, lastExitRow.time) : null;
+    const entryTime = entryRow ? etTimeToUtc(date, entryRow.time) : null;
+    const exitTime = lastExitRow ? etTimeToUtc(date, lastExitRow.time) : null;
 
     if (entryTime) {
       series.createPriceLine({ price: entry, color: win, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true, title: "Entry" });
@@ -206,7 +211,7 @@ export function TradeChart({ bars, executions, entry, exit, pnl, qty, status }: 
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       chart.remove();
     };
-  }, [bars, executions, entry, exit, isClosed, isWin, timeframe]);
+  }, [bars, executions, date, entry, exit, isClosed, isWin, timeframe]);
 
   if (bars.length === 0) {
     return (
