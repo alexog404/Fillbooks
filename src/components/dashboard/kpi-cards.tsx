@@ -80,7 +80,7 @@ export function KpiCards({ trades }: { trades: Trade[] }) {
               <div className="h-full" style={{ width: `${wlShare.toFixed(1)}%`, background: "var(--win)" }} />
               <div className="h-full" style={{ width: `${(100 - wlShare).toFixed(1)}%`, background: "var(--loss)" }} />
             </div>
-            <div className="flex justify-between w-[110px] text-[13px] font-mono mt-0.5">
+            <div className="flex gap-2 min-w-[110px] text-[13px] font-mono mt-0.5 whitespace-nowrap">
               <span style={{ color: "var(--win)" }}>{money(kpis.avgWin, true)}</span>
               <span style={{ color: "var(--loss)" }}>{money(kpis.avgLoss, false)}</span>
             </div>
