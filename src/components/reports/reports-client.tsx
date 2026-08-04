@@ -5,12 +5,10 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import {
   averagePriceDistribution,
   computeStatRows,
-  rHistogramByDay,
-  rMultipleStats,
   winRateByDayOfWeek,
   winRateByTimeOfDay,
 } from "@/lib/reports";
-import { dateShort, fmtDay, fmtLocal, fridayOf, mondayOf, type Trade } from "@/lib/trades";
+import { fmtDay, fmtLocal, fridayOf, mondayOf, type Trade } from "@/lib/trades";
 
 function BarRow({ label, pct, pctText, color }: { label: string; pct: number; pctText: string; color: string }) {
   return (
@@ -52,8 +50,6 @@ export function ReportsClient({ trades }: { trades: Trade[] }) {
   const statRows = computeStatRows(reportsTrades);
   const byTime = winRateByTimeOfDay(reportsTrades);
   const byDow = winRateByDayOfWeek(reportsTrades);
-  const rStats = rMultipleStats(reportsTrades);
-  const rHistogram = rHistogramByDay(reportsTrades, dateShort);
   const byPrice = averagePriceDistribution(reportsTrades);
 
   return (
@@ -116,38 +112,6 @@ export function ReportsClient({ trades }: { trades: Trade[] }) {
                 <BarRow key={b.label} label={b.label} pct={b.pct} pctText={b.pct.toFixed(0) + "%"} color={b.color} />
               ))}
             </div>
-          </div>
-
-          <div className="bg-surface border border-border rounded-[10px] p-4 mb-3.5">
-            <div className="text-[15.5px] font-bold mb-3.5">R-Multiple Analysis</div>
-            {rStats === null || rHistogram === null ? (
-              <div className="text-[15px] text-text-muted py-4 text-center">
-                No R-multiples set yet — add a target/stop on a Trade Detail page to see this.
-              </div>
-            ) : (
-              <>
-                <div className="grid gap-3 mb-4.5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))" }}>
-                  {rStats.map((rs) => (
-                    <div key={rs.label}>
-                      <div className="text-[13.5px] text-text-muted uppercase tracking-[0.04em]">{rs.label}</div>
-                      <div className="text-[20px] font-bold font-mono mt-1" style={{ color: rs.color }}>{rs.value}</div>
-                    </div>
-                  ))}
-                </div>
-                <div className="text-[14px] text-text-muted mb-2">Average R by trading day — spot your worst days</div>
-                <div className="flex items-end gap-1.5 h-[130px] overflow-x-auto pb-0.5">
-                  {rHistogram.map((rh, i) => (
-                    <div key={i} className="flex-none w-[34px] flex flex-col items-center justify-end h-full gap-1">
-                      <div className="text-[12.5px] text-text-secondary font-mono whitespace-nowrap">{rh.avgR.toFixed(2)}</div>
-                      <div className="w-full rounded" style={{ height: `${rh.barHeightPct}%`, minHeight: 2, background: rh.color }} />
-                      <div className="text-[11.5px] text-text-muted text-center whitespace-nowrap" style={{ transform: "rotate(-40deg)", transformOrigin: "top center", marginTop: 4 }}>
-                        {rh.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
           </div>
 
           <div className="bg-surface border border-border rounded-[10px] p-4">

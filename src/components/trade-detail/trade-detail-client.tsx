@@ -31,8 +31,6 @@ export function TradeDetailClient({
   const [isPending, startTransition] = useTransition();
   const [notesDraft, setNotesDraft] = useState(trade.notes ?? "");
   const [notesSaved, setNotesSaved] = useState(true);
-  const [targetDraft, setTargetDraft] = useState(trade.target != null ? String(trade.target) : "");
-  const [stopDraft, setStopDraft] = useState(trade.stop != null ? String(trade.stop) : "");
   const [tab, setTab] = useState<"notes" | "executions">("notes");
 
   function saveField(updates: Parameters<typeof updateTradeJournal>[1]) {
@@ -41,21 +39,10 @@ export function TradeDetailClient({
     });
   }
 
-  function saveRiskLevels() {
-    const target = targetDraft.trim() === "" ? null : Number(targetDraft);
-    const stop = stopDraft.trim() === "" ? null : Number(stopDraft);
-    saveField({ target: Number.isFinite(target) ? target : null, stop: Number.isFinite(stop) ? stop : null });
-  }
-
   function saveNotes() {
     saveField({ notes: notesDraft });
     setNotesSaved(true);
   }
-
-  const plannedR = trade.target != null && trade.stop != null
-    ? (trade.side === "long" ? (trade.target - trade.entry) / (trade.entry - trade.stop || 1) : (trade.entry - trade.target) / (trade.stop - trade.entry || 1)).toFixed(1) + "R"
-    : "Not set";
-  const realizedR = trade.r != null ? trade.r.toFixed(2) + "R" : "Not set";
 
   const fromLabel = FROM_LABELS[from] ?? "Dashboard";
 
@@ -145,45 +132,7 @@ export function TradeDetailClient({
                 <div className="text-text-muted text-[13.5px]">Duration</div>
                 <div className="font-mono font-semibold mt-0.5">{trade.durationSeconds != null ? Math.round(trade.durationSeconds / 60) + "m" : "—"}</div>
               </div>
-              <div>
-                <div className="text-text-muted text-[13.5px]">Planned R</div>
-                <div className="font-mono mt-0.5">{plannedR}</div>
-              </div>
-              <div>
-                <div className="text-text-muted text-[13.5px]">Realized R</div>
-                <div className="font-mono mt-0.5">{realizedR}</div>
-              </div>
             </div>
-          </div>
-
-          <div className="bg-surface border border-border rounded-[10px] p-4">
-            <div className="text-[14px] font-bold mb-2.5">Risk levels</div>
-            <div className="flex gap-2 mb-2">
-              <div className="flex-1">
-                <div className="text-[13.5px] text-text-muted mb-1">Target</div>
-                <input
-                  value={targetDraft}
-                  onChange={(e) => setTargetDraft(e.target.value)}
-                  placeholder="—"
-                  className="w-full text-[15px] px-2 py-1.5 rounded-md bg-surface-2 border border-border font-mono"
-                  style={{ color: "var(--win)" }}
-                />
-              </div>
-              <div className="flex-1">
-                <div className="text-[13.5px] text-text-muted mb-1">Stop</div>
-                <input
-                  value={stopDraft}
-                  onChange={(e) => setStopDraft(e.target.value)}
-                  placeholder="—"
-                  className="w-full text-[15px] px-2 py-1.5 rounded-md bg-surface-2 border border-border font-mono"
-                  style={{ color: "var(--loss)" }}
-                />
-              </div>
-            </div>
-            <button type="button" onClick={saveRiskLevels} disabled={isPending} className="text-[14px] px-3 py-1.5 rounded-md bg-primary text-white font-bold cursor-pointer">
-              Save
-            </button>
-            <div className="text-[13px] text-text-muted mt-1.5">Setting a stop unlocks the Realized R above and Reports&apos; R-Multiple Analysis.</div>
           </div>
 
           <div className="bg-surface border border-border rounded-[10px] p-4">
@@ -193,7 +142,7 @@ export function TradeDetailClient({
         </div>
 
         <div className="flex flex-col gap-3 min-w-0">
-          <TradeChart bars={bars} executions={executions} target={trade.target} stop={trade.stop} />
+          <TradeChart bars={bars} executions={executions} />
 
           <div className="bg-surface border border-border rounded-[10px]">
             <div className="flex gap-1 px-3.5 pt-2.5 border-b border-border">

@@ -35,8 +35,8 @@ function computeTradeId(symbol: string, direction: string, entryDate: string, en
  * are derived data, dropped and rebuilt rather than incrementally patched.
  * Existing rows whose id still matches (same logical trade) are updated in
  * place via upsert rather than deleted -- that's what makes the stable id
- * above pay off: journal-ish fields (mistakes, habits, rating, target, stop,
- * mae, mfe, hasNote) are deliberately left out of the update `set`, so
+ * above pay off: journal-ish fields (mistakes, habits, rating, mae, mfe,
+ * hasNote) are deliberately left out of the update `set`, so
  * re-running this doesn't erase anything a user entered by hand later.
  */
 export async function rebuildTradesForSymbol(db: Db, symbol: string): Promise<void> {

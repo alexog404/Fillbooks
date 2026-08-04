@@ -26,15 +26,6 @@ export function KpiCards({ trades }: { trades: Trade[] }) {
   const winLossRatio = Math.abs(kpis.avgLoss) ? kpis.avgWin / Math.abs(kpis.avgLoss) : kpis.avgWin > 0 ? 99 : 0;
   const wlShare = kpis.avgWin + Math.abs(kpis.avgLoss) ? (kpis.avgWin / (kpis.avgWin + Math.abs(kpis.avgLoss))) * 100 : 50;
 
-  const rSorted = [...trades].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-  const rSeries = rSorted.map((t) => t.r ?? 0);
-  const avgR = rSeries.length ? rSeries.reduce((s, v) => s + v, 0) / rSeries.length : 0;
-  const rMin = Math.min(...rSeries, 0), rMax = Math.max(...rSeries, 0), rRg = rMax - rMin || 1;
-  const rStepX = 90 / Math.max(rSeries.length - 1, 1);
-  const rSparkPoints = rSeries.map((v, i) => `${(i * rStepX).toFixed(1)},${(34 - ((v - rMin) / rRg) * 30 - 2).toFixed(1)}`).join(" ");
-  const rSparkArea = `0,34 ${rSparkPoints} 90,34`;
-  const rColorAvg = avgR >= 0 ? "var(--win)" : "var(--loss)";
-
   return (
     <div className="grid gap-3 mb-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
       <Card
@@ -93,24 +84,6 @@ export function KpiCards({ trades }: { trades: Trade[] }) {
         value={money(kpis.expectancy, true)}
         valueColor={pnlColorVar(kpis.expectancy)}
         sub={<div className="text-[14px] text-text-muted mt-1">per trade</div>}
-      />
-
-      <Card
-        label="Average R"
-        value={avgR.toFixed(2) + "R"}
-        valueColor={rColorAvg}
-        visual={
-          <svg width="90" height="34" viewBox="0 0 90 34" className="flex-none">
-            <defs>
-              <linearGradient id="rSparkGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={rColorAvg} stopOpacity="0.6" />
-                <stop offset="100%" stopColor={rColorAvg} stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <polyline points={rSparkArea} fill="url(#rSparkGrad)" stroke="none" />
-            <polyline points={rSparkPoints} fill="none" stroke={rColorAvg} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
-          </svg>
-        }
       />
     </div>
   );

@@ -43,6 +43,13 @@
       "when": 1785788628964,
       "tag": "0005_remarkable_master_chief",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785863028860,
+      "tag": "0006_sudden_patriot",
+      "breakpoints": true
     }
   ]
 }

@@ -74,7 +74,7 @@ export function PnlCalendar({ trades, startingBalance, initialMonthKey }: { trad
                 >
                   <div className="text-[12.5px] text-text-muted whitespace-nowrap">{cell.day}</div>
                   <div className="text-[13px] font-bold font-mono mt-[3px] whitespace-nowrap" style={{ color: pnlColorVar(cell.pnl) }}>{moneyCompact(cell.pnl)}</div>
-                  <div className="text-[11px] text-text-muted mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">{cell.count}t · {cell.r.toFixed(1)}R</div>
+                  <div className="text-[11px] text-text-muted mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">{cell.count} trade{cell.count === 1 ? "" : "s"}</div>
                 </div>
               );
             })}

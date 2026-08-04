@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   CandlestickSeries,
   CrosshairMode,
-  LineStyle,
   createChart,
   createSeriesMarkers,
   type MouseEventParams,
@@ -18,8 +17,6 @@ import type { TradeExecutionRow } from "@/trades/queries";
 export interface TradeChartProps {
   bars: Bar[];
   executions: TradeExecutionRow[];
-  target: number | null;
-  stop: number | null;
 }
 
 function toUtcTimestamp(d: Date): UTCTimestamp {
@@ -61,7 +58,7 @@ function aggregate(bars: Bar[], minutes: number): Bar[] {
     }));
 }
 
-export function TradeChart({ bars, executions, target, stop }: TradeChartProps) {
+export function TradeChart({ bars, executions }: TradeChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [timeframe, setTimeframe] = useState<1 | 5 | 15>(1);
   const [hovered, setHovered] = useState<Hovered | null>(null);
@@ -112,13 +109,6 @@ export function TradeChart({ bars, executions, target, stop }: TradeChartProps) 
     });
     createSeriesMarkers(series, seriesMarkers);
 
-    if (target !== null) {
-      series.createPriceLine({ price: target, color: win, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true, title: "Target" });
-    }
-    if (stop !== null) {
-      series.createPriceLine({ price: stop, color: loss, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true, title: "Stop" });
-    }
-
     chart.timeScale().fitContent();
 
     function handleCrosshairMove(param: MouseEventParams) {
@@ -135,7 +125,7 @@ export function TradeChart({ bars, executions, target, stop }: TradeChartProps) 
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       chart.remove();
     };
-  }, [bars, executions, target, stop, timeframe]);
+  }, [bars, executions, timeframe]);
 
   if (bars.length === 0) {
     return (

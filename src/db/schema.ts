@@ -7,12 +7,11 @@ const id = () =>
 
 const utcMs = (name: string) => timestamp(name, { withTimezone: true, mode: "date" });
 
-// `mode: "number"` is required on every money/qty/ratio column -- without
-// it, postgres-js returns `numeric` as a string, and `"7.60" * 60` is a
+// `mode: "number"` is required on every money/qty column -- without it,
+// postgres-js returns `numeric` as a string, and `"7.60" * 60` is a
 // silent, live bug (see CLAUDE.md).
 const money = (name: string) => numeric(name, { precision: 12, scale: 4, mode: "number" });
 const qty = (name: string) => numeric(name, { precision: 14, scale: 4, mode: "number" });
-const ratio = (name: string) => numeric(name, { precision: 10, scale: 6, mode: "number" });
 
 // Single-tenant app -- no per-user scoping anywhere in this schema (no
 // auth, by design). One row per broker, upserted, never appended.
@@ -37,7 +36,7 @@ export const brokerConnections = pgTable(
 // One row per closed lot (see CLAUDE.md's FIFO-boundary decision). Derived
 // data -- rebuilt from `executions` on every CSV import, not hand-edited
 // directly except for the journal-ish fields below (mistakes, habits,
-// rating, target, stop, mae, mfe), which a rebuild leaves untouched.
+// rating, mae, mfe), which a rebuild leaves untouched.
 export const trades = pgTable("trades", {
   id: id(),
   // Local Y-M-D / H:M:S strings, not `timestamptz` -- see CLAUDE.md's
@@ -50,7 +49,6 @@ export const trades = pgTable("trades", {
   entry: money("entry").notNull(),
   exit: money("exit").notNull(),
   pnl: money("pnl").notNull(),
-  r: ratio("r"),
   setup: text("setup"),
   durationSeconds: integer("duration_seconds"),
   status: text("status", { enum: ["closed", "working", "cancelled"] }).notNull(),
@@ -58,8 +56,6 @@ export const trades = pgTable("trades", {
   mistakes: text("mistakes").array().notNull().default([]),
   habits: text("habits").array().notNull().default([]),
   rating: integer("rating"),
-  target: money("target"),
-  stop: money("stop"),
   mae: money("mae"),
   mfe: money("mfe"),
   notes: text("notes"),

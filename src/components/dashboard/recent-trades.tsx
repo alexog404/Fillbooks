@@ -6,13 +6,13 @@ export function RecentTrades({ trades }: { trades: Trade[] }) {
     .sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time))
     .slice(0, 8);
 
-  const cols = "grid-cols-[20fr_42fr_18fr_43fr_24fr_53fr]";
+  const cols = "grid-cols-[20fr_42fr_18fr_43fr_53fr]";
 
   return (
     <div className="bg-surface border border-border rounded-[10px] min-w-0">
       <div className="px-[18px] py-3.5 border-b border-border text-[16px] font-bold">Recent Trades</div>
       <div className={`grid ${cols} gap-1 px-[9px] py-2 text-[12px] text-text-muted uppercase tracking-[0.02em]`}>
-        <div>Date</div><div>Sym</div><div className="text-right">Qty</div><div className="text-right">P&L</div><div className="text-right">R</div><div>Status</div>
+        <div>Date</div><div>Sym</div><div className="text-right">Qty</div><div className="text-right">P&L</div><div>Status</div>
       </div>
       {recent.length === 0 && <div className="px-[18px] py-6 text-[17px] text-text-muted">No trades yet.</div>}
       {recent.map((t) => {
@@ -28,7 +28,6 @@ export function RecentTrades({ trades }: { trades: Trade[] }) {
             <div className="font-bold font-mono overflow-hidden text-ellipsis whitespace-nowrap text-[13px]">{t.symbol}</div>
             <div className="text-right font-mono text-[12px] text-text-secondary whitespace-nowrap">{t.qty}</div>
             <div className="text-right font-bold font-mono text-[12.5px] whitespace-nowrap" style={{ color: pnlColorVar(t.pnl) }}>{money(t.pnl, true)}</div>
-            <div className="text-right font-mono text-[12px] whitespace-nowrap" style={{ color: pnlColorVar(t.r ?? 0) }}>{(t.r ?? 0).toFixed(1)}R</div>
             <div className="flex items-center justify-end gap-1 min-w-0 overflow-hidden">
               <span className="w-1.5 h-1.5 rounded-full flex-none" style={{ background: statusDot }} />
               <span className="text-[11px] font-medium text-text-muted whitespace-nowrap overflow-hidden text-ellipsis">{statusText}</span>

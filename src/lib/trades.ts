@@ -108,7 +108,6 @@ export interface CalendarCell {
   day: number;
   pnl: number;
   count: number;
-  r: number;
   empty?: boolean;
 }
 
@@ -118,12 +117,11 @@ export interface CalendarWeek {
 }
 
 export function buildCalendar(trades: Trade[], year: number, month: number): { weeks: CalendarWeek[] } {
-  const byDate: Record<string, { pnl: number; count: number; rSum: number }> = {};
+  const byDate: Record<string, { pnl: number; count: number }> = {};
   trades.forEach((t) => {
-    if (!byDate[t.date]) byDate[t.date] = { pnl: 0, count: 0, rSum: 0 };
+    if (!byDate[t.date]) byDate[t.date] = { pnl: 0, count: 0 };
     byDate[t.date].pnl += t.pnl;
     byDate[t.date].count += 1;
-    byDate[t.date].rSum += t.r ?? 0;
   });
   const firstDay = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -133,7 +131,7 @@ export function buildCalendar(trades: Trade[], year: number, month: number): { w
   for (let d = 1; d <= daysInMonth; d++) {
     const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const day = byDate[iso];
-    cells.push(day ? { date: iso, day: d, pnl: day.pnl, count: day.count, r: day.rSum } : { date: iso, day: d, pnl: 0, count: 0, r: 0, empty: true });
+    cells.push(day ? { date: iso, day: d, pnl: day.pnl, count: day.count } : { date: iso, day: d, pnl: 0, count: 0, empty: true });
   }
   const weeks: CalendarWeek[] = [];
   for (let i = 0; i < cells.length; i += 7) {

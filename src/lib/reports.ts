@@ -59,63 +59,6 @@ export function averagePriceDistribution(trades: Trade[]): PriceBar[] {
   return PRICE_BUCKETS.map(([, , label], i) => ({ label, pct: (shareTotals[i] / max) * 100, shares: shareTotals[i] }));
 }
 
-export interface RStat {
-  label: string;
-  value: string;
-  color: string;
-}
-
-/** Only trades with a real R (target/stop set on Trade Detail) count --
- * a freshly-synced trade starts with neither, so this can legitimately be
- * empty for a while. Returns null rather than misleading zeros in that case. */
-export function rMultipleStats(trades: Trade[]): RStat[] | null {
-  const rVals = trades.map((t) => t.r).filter((r): r is number => r != null);
-  if (rVals.length === 0) return null;
-  const avg = rVals.reduce((s, v) => s + v, 0) / rVals.length;
-  const wins = rVals.filter((v) => v > 0);
-  const losses = rVals.filter((v) => v < 0);
-  const avgWin = wins.length ? wins.reduce((s, v) => s + v, 0) / wins.length : 0;
-  const avgLoss = losses.length ? losses.reduce((s, v) => s + v, 0) / losses.length : 0;
-  const best = Math.max(...rVals);
-  const worst = Math.min(...rVals);
-  return [
-    { label: "Avg R", value: avg.toFixed(2) + "R", color: pnlColorVar(avg) },
-    { label: "Avg Winning R", value: "+" + avgWin.toFixed(2) + "R", color: "var(--win)" },
-    { label: "Avg Losing R", value: avgLoss.toFixed(2) + "R", color: "var(--loss)" },
-    { label: "Best R", value: (best >= 0 ? "+" : "") + best.toFixed(2) + "R", color: "var(--win)" },
-    { label: "Worst R", value: worst.toFixed(2) + "R", color: "var(--loss)" },
-  ];
-}
-
-export interface RHistogramBar {
-  label: string;
-  avgR: number;
-  barHeightPct: number;
-  color: string;
-}
-
-export function rHistogramByDay(trades: Trade[], dateShortFn: (d: string) => string): RHistogramBar[] | null {
-  const withR = trades.filter((t) => t.r != null);
-  if (withR.length === 0) return null;
-  const byDate = new Map<string, number[]>();
-  withR.forEach((t) => {
-    if (!byDate.has(t.date)) byDate.set(t.date, []);
-    byDate.get(t.date)!.push(t.r!);
-  });
-  const dates = [...byDate.keys()].sort();
-  const avgs = dates.map((d) => {
-    const vals = byDate.get(d)!;
-    return vals.reduce((s, v) => s + v, 0) / vals.length;
-  });
-  const maxAbs = Math.max(...avgs.map((v) => Math.abs(v)), 0.1);
-  return dates.map((d, i) => ({
-    label: dateShortFn(d),
-    avgR: avgs[i],
-    barHeightPct: (Math.abs(avgs[i]) / maxAbs) * 100,
-    color: avgs[i] < 0 ? "var(--loss)" : "var(--win)",
-  }));
-}
-
 export interface StatCell {
   label: string;
   value: string;

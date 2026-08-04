@@ -13,7 +13,7 @@ function statusMeta(status: Trade["status"]) {
   return { label: "Working", dot: "#f59e0b" };
 }
 
-const COLS = "96px 96px 64px 42px 56px 1fr 56px 90px 56px 120px 66px 60px 30px";
+const COLS = "96px 96px 64px 42px 56px 1fr 56px 90px 120px 66px 60px 30px";
 
 export function TradesTable({ trades }: { trades: Trade[] }) {
   const allDates = [...new Set(trades.map((t) => t.date))].sort();
@@ -90,9 +90,6 @@ export function TradesTable({ trades }: { trades: Trade[] }) {
         <div className="text-right font-mono text-text-secondary">{t.entry.toFixed(2)}</div>
         <div className="text-right font-mono text-text-secondary">{t.exit.toFixed(2)}</div>
         <div className="text-right font-bold font-mono" style={{ color: pnlColorVar(t.pnl) }}>{money(t.pnl, true)}</div>
-        <div className="text-right font-mono" style={{ color: t.r != null ? pnlColorVar(t.r) : "var(--text-muted)" }}>
-          {t.r != null ? t.r.toFixed(1) + "R" : "—"}
-        </div>
         <div className="text-text-muted font-mono">{formatDuration(t.durationSeconds)}</div>
         <div className="flex items-center gap-1.5 text-[14px] text-text-secondary">
           <span className="w-1.5 h-1.5 rounded-full flex-none" style={{ background: meta.dot }} />
@@ -158,7 +155,6 @@ export function TradesTable({ trades }: { trades: Trade[] }) {
               <div onClick={() => toggleSort("pnl")} className="text-right cursor-pointer">
                 Net P&L{sortKey === "pnl" ? (sortDir === "asc" ? " ▲" : " ▼") : ""}
               </div>
-              <div className="text-right">R</div>
               <div>Duration</div>
               <div>Status</div>
               <div>Note</div>
