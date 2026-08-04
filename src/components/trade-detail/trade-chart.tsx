@@ -61,6 +61,14 @@ interface BoxRect {
   height: number;
 }
 
+interface OverlayState {
+  box: BoxRect | null;
+  entryY: number | null;
+  exitY: number | null;
+}
+
+const NO_OVERLAY: OverlayState = { box: null, entryY: null, exitY: null };
+
 /** `timeToCoordinate` only resolves timestamps that land exactly on a
  * plotted bar -- an execution's real fill time (seconds into a bar, or a
  * thinly-traded minute Alpaca has no bar for at all) is often not one, and
@@ -104,7 +112,7 @@ export function TradeChart({ bars, executions, date, entry, exit, pnl, qty, stat
   const containerRef = useRef<HTMLDivElement>(null);
   const [timeframe, setTimeframe] = useState<1 | 5 | 15>(1);
   const [hovered, setHovered] = useState<Hovered | null>(null);
-  const [box, setBox] = useState<BoxRect | null>(null);
+  const [overlay, setOverlay] = useState<OverlayState>(NO_OVERLAY);
 
   const isClosed = status === "closed";
   const isWin = pnl >= 0;
@@ -149,78 +157,68 @@ export function TradeChart({ bars, executions, date, entry, exit, pnl, qty, stat
     const entryTime = entryRow ? etTimeToUtc(date, entryRow.time) : null;
     const exitTime = lastExitRow ? etTimeToUtc(date, lastExitRow.time) : null;
 
+    // Native axis labels are pinned to the right edge, where the current/
+    // last price already lives -- the dashed lines stay (via createPriceLine),
+    // but their labels are custom-rendered pinned to the *left* instead (see
+    // the overlay render below) so the right edge stays readable.
     if (entryTime) {
-      series.createPriceLine({ price: entry, color: win, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true, title: "Entry" });
+      series.createPriceLine({ price: entry, color: win, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: false });
     }
     if (exitTime) {
-      series.createPriceLine({ price: exit, color: isWin ? win : loss, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: true, title: "Exit" });
+      series.createPriceLine({ price: exit, color: isWin ? win : loss, lineWidth: 1, lineStyle: LineStyle.Dashed, axisLabelVisible: false });
     }
 
-    // Default to a window padded around the trade itself, not the whole
-    // session -- fitContent() on a full 390-bar day made short trades a
-    // sliver a few pixels wide, with markers overlapping and unreadable.
-    function applyDefaultWindow() {
-      const barTimes = displayBars.map((b) => b.time.getTime());
-      const dataStart = barTimes[0];
-      const dataEnd = barTimes[barTimes.length - 1];
-      const windowStart = entryTime ? entryTime.getTime() : dataStart;
-      const windowEnd = exitTime ? exitTime.getTime() : entryTime ? entryTime.getTime() : dataEnd;
-      const durationMin = Math.max(1, (windowEnd - windowStart) / 60_000);
-      const padMs = Math.min(60, Math.max(8, Math.round(durationMin * 0.7))) * 60_000;
-      const from = Math.max(dataStart, windowStart - padMs);
-      const to = Math.min(dataEnd, windowEnd + padMs);
-      if (from < to) {
-        chart.timeScale().setVisibleRange({ from: toUtcTimestamp(new Date(from)), to: toUtcTimestamp(new Date(to)) });
-      } else {
-        chart.timeScale().fitContent();
-      }
-    }
+    function renderOverlay() {
+      const containerWidth = container!.clientWidth;
+      const yEntry = entryTime ? series.priceToCoordinate(entry) : null;
+      const yExit = exitTime ? series.priceToCoordinate(exit) : null;
 
-    function renderBox() {
-      if (!entryTime || !exitTime) {
-        setBox(null);
-        return;
+      let box: BoxRect | null = null;
+      if (entryTime && exitTime && yEntry != null && yExit != null) {
+        const x1 = chart.timeScale().timeToCoordinate(toUtcTimestamp(nearestBarTime(displayBars, entryTime)));
+        const x2 = chart.timeScale().timeToCoordinate(toUtcTimestamp(nearestBarTime(displayBars, exitTime)));
+        if (x1 != null && x2 != null) {
+          // Clamped to the container's own bounds -- panning the timeline
+          // used to push this well past the chart card into whatever sat
+          // next to it on the page.
+          const left = Math.max(0, Math.min(x1, x2));
+          const right = Math.min(containerWidth, Math.max(x1, x2));
+          if (right > left) {
+            box = { left, top: Math.min(yEntry, yExit), width: Math.max(2, right - left), height: Math.max(2, Math.abs(yExit - yEntry)) };
+          }
+        }
       }
-      const x1 = chart.timeScale().timeToCoordinate(toUtcTimestamp(nearestBarTime(displayBars, entryTime)));
-      const x2 = chart.timeScale().timeToCoordinate(toUtcTimestamp(nearestBarTime(displayBars, exitTime)));
-      const yEntry = series.priceToCoordinate(entry);
-      const yExit = series.priceToCoordinate(exit);
-      if (x1 == null || x2 == null || yEntry == null || yExit == null) {
-        setBox(null);
-        return;
-      }
-      setBox({
-        left: Math.min(x1, x2),
-        top: Math.min(yEntry, yExit),
-        width: Math.max(2, Math.abs(x2 - x1)),
-        height: Math.max(2, Math.abs(yExit - yEntry)),
-      });
+
+      setOverlay({ box, entryY: yEntry, exitY: yExit });
     }
 
     // `autoSize` fits the chart to `container` via ResizeObserver, which
-    // fires *after* this synchronous setup runs -- calling setVisibleRange
-    // or reading coordinates before that first resize lands silently no-ops
-    // against a zero-width chart. Worse, the right price scale's autoscale
-    // recomputes off the visible range on its own paint cycle, a tick
-    // behind the logical-range-change event that's supposed to signal it's
-    // ready -- a single read after that event can still land on the *old*
-    // (whole-session) price scale. Polling a handful of frames is a cheap,
+    // fires *after* this synchronous setup runs -- calling fitContent()
+    // or reading coordinates before that first resize lands silently
+    // no-ops against a zero-width chart. Worse, the right price scale's
+    // autoscale recomputes off the visible range on its own paint cycle, a
+    // tick behind the logical-range-change event that's supposed to
+    // signal it's ready -- a single read after that event can still land
+    // on stale coordinates. Polling a handful of frames is a cheap,
     // reliable way to land on the settled values without depending on
     // exactly which internal tick they land on.
     let cancelled = false;
     let framesLeft = 10;
-    function pollRenderBox() {
+    function pollRenderOverlay() {
       if (cancelled) return;
-      renderBox();
+      renderOverlay();
       framesLeft--;
-      if (framesLeft > 0) requestAnimationFrame(pollRenderBox);
+      if (framesLeft > 0) requestAnimationFrame(pollRenderOverlay);
     }
     const raf = requestAnimationFrame(() => {
-      applyDefaultWindow();
-      pollRenderBox();
+      // Show the whole loaded session by default, like a real charting
+      // platform -- panning/zooming to focus on the trade is left to the
+      // user rather than guessed at with a padded window.
+      chart.timeScale().fitContent();
+      pollRenderOverlay();
     });
-    chart.timeScale().subscribeVisibleLogicalRangeChange(renderBox);
-    const resizeObserver = new ResizeObserver(renderBox);
+    chart.timeScale().subscribeVisibleLogicalRangeChange(renderOverlay);
+    const resizeObserver = new ResizeObserver(renderOverlay);
     resizeObserver.observe(container);
 
     function handleCrosshairMove(param: MouseEventParams) {
@@ -237,7 +235,7 @@ export function TradeChart({ bars, executions, date, entry, exit, pnl, qty, stat
       cancelled = true;
       cancelAnimationFrame(raf);
       resizeObserver.disconnect();
-      chart.timeScale().unsubscribeVisibleLogicalRangeChange(renderBox);
+      chart.timeScale().unsubscribeVisibleLogicalRangeChange(renderOverlay);
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       chart.remove();
     };
@@ -282,16 +280,17 @@ export function TradeChart({ bars, executions, date, entry, exit, pnl, qty, stat
           </div>
         )}
       </div>
-      <div className="relative h-[300px] w-full">
+      <div className="relative h-[300px] w-full overflow-hidden">
         <div ref={containerRef} className="absolute inset-0" />
-        {box && (
+        {overlay.box && (
           <div
             className="absolute pointer-events-none rounded-[2px]"
             style={{
-              left: box.left,
-              top: box.top,
-              width: box.width,
-              height: box.height,
+              zIndex: 2,
+              left: overlay.box.left,
+              top: overlay.box.top,
+              width: overlay.box.width,
+              height: overlay.box.height,
               background: `color-mix(in srgb, ${zoneColor} 16%, transparent)`,
               border: `1px solid ${zoneColor}`,
             }}
@@ -302,6 +301,22 @@ export function TradeChart({ bars, executions, date, entry, exit, pnl, qty, stat
             >
               {money(pnl, true)} · {qty} sh
             </div>
+          </div>
+        )}
+        {overlay.entryY != null && (
+          <div
+            className="absolute pointer-events-none left-1 whitespace-nowrap rounded px-1.5 py-0.5 text-[11px] font-mono font-bold"
+            style={{ zIndex: 3, top: overlay.entryY, transform: "translateY(-50%)", background: "var(--win)", color: "#fff" }}
+          >
+            Entry {entry.toFixed(2)}
+          </div>
+        )}
+        {overlay.exitY != null && (
+          <div
+            className="absolute pointer-events-none left-1 whitespace-nowrap rounded px-1.5 py-0.5 text-[11px] font-mono font-bold"
+            style={{ zIndex: 3, top: overlay.exitY, transform: "translateY(-50%)", background: zoneColor, color: "#fff" }}
+          >
+            Exit {exit.toFixed(2)}
           </div>
         )}
       </div>
