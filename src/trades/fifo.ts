@@ -40,21 +40,27 @@ export interface FifoTrade {
 // in the FIFO queue accumulating exit fills from one or more later opposite-
 // side executions until its remainingQty hits zero, at which point *that
 // lot* (not the overall position) closes as a trade. Money is tracked in
-// integer cents throughout and only converted to dollars in finalizeLot().
+// integer units of $0.0001 throughout (matching the `money` column's own
+// numeric(_, 4) scale -- see CLAUDE.md's integer-cents trap) and only
+// converted to dollars in finalizeLot(). Whole cents aren't fine enough:
+// Schwab's API reports real sub-penny fill prices (e.g. 3.5125), which
+// rounding to cents would silently truncate to 3.51 and distort P&L.
 interface Lot {
   direction: "long" | "short";
   openedAt: Date;
   entryQty: number;
-  entryPriceCents: number;
-  feesCents: number;
+  entryPriceUnits: number;
+  feesUnits: number;
   remainingQty: number;
   exitQty: number;
-  exitSumCents: number;
+  exitSumUnits: number;
   links: FifoTradeExecutionLink[];
 }
 
-function toCents(dollars: number): number {
-  return Math.round(dollars * 100);
+const UNITS_PER_DOLLAR = 10000;
+
+function toUnits(dollars: number): number {
+  return Math.round(dollars * UNITS_PER_DOLLAR);
 }
 
 function openingSide(direction: "long" | "short"): "buy" | "sell" {
@@ -66,17 +72,17 @@ function directionOf(side: "buy" | "sell"): "long" | "short" {
 }
 
 function finalizeLot(lot: Lot, closedAt: Date | null): FifoTrade {
-  const avgEntry = lot.entryPriceCents / 100;
-  const avgExit = lot.exitQty > 0 ? lot.exitSumCents / lot.exitQty / 100 : null;
+  const avgEntry = lot.entryPriceUnits / UNITS_PER_DOLLAR;
+  const avgExit = lot.exitQty > 0 ? lot.exitSumUnits / lot.exitQty / UNITS_PER_DOLLAR : null;
 
-  const entrySumCents = lot.entryQty * lot.entryPriceCents;
-  const grossPnlCents =
+  const entrySumUnits = lot.entryQty * lot.entryPriceUnits;
+  const grossPnlUnits =
     lot.exitQty === lot.entryQty
       ? lot.direction === "long"
-        ? lot.exitSumCents - entrySumCents
-        : entrySumCents - lot.exitSumCents
+        ? lot.exitSumUnits - entrySumUnits
+        : entrySumUnits - lot.exitSumUnits
       : null;
-  const netPnlCents = grossPnlCents !== null ? grossPnlCents + lot.feesCents : null;
+  const netPnlUnits = grossPnlUnits !== null ? grossPnlUnits + lot.feesUnits : null;
 
   return {
     direction: lot.direction,
@@ -86,9 +92,9 @@ function finalizeLot(lot: Lot, closedAt: Date | null): FifoTrade {
     qty: lot.entryQty,
     avgEntry,
     avgExit,
-    grossPnl: grossPnlCents !== null ? grossPnlCents / 100 : null,
-    fees: lot.feesCents / 100,
-    netPnl: netPnlCents !== null ? netPnlCents / 100 : null,
+    grossPnl: grossPnlUnits !== null ? grossPnlUnits / UNITS_PER_DOLLAR : null,
+    fees: lot.feesUnits / UNITS_PER_DOLLAR,
+    netPnl: netPnlUnits !== null ? netPnlUnits / UNITS_PER_DOLLAR : null,
     links: lot.links,
   };
 }
@@ -110,41 +116,41 @@ export function matchFifoTrades(executions: FifoExecutionInput[]): FifoTrade[] {
   const trades: FifoTrade[] = [];
   const queue: Lot[] = [];
 
-  function pushLot(executionId: string, executedAt: Date, side: "buy" | "sell", qty: number, priceCents: number, feesCents: number) {
+  function pushLot(executionId: string, executedAt: Date, side: "buy" | "sell", qty: number, priceUnits: number, feesUnits: number) {
     queue.push({
       direction: directionOf(side),
       openedAt: executedAt,
       entryQty: qty,
-      entryPriceCents: priceCents,
-      feesCents,
+      entryPriceUnits: priceUnits,
+      feesUnits,
       remainingQty: qty,
       exitQty: 0,
-      exitSumCents: 0,
-      links: [{ executionId, role: "entry", qtyApplied: qty, price: priceCents / 100 }],
+      exitSumUnits: 0,
+      links: [{ executionId, role: "entry", qtyApplied: qty, price: priceUnits / UNITS_PER_DOLLAR }],
     });
   }
 
   for (const exec of executions) {
-    const priceCents = toCents(exec.price);
+    const priceUnits = toUnits(exec.price);
     const direction = queue.length > 0 ? queue[0].direction : null;
 
     if (direction === null || exec.side === openingSide(direction)) {
-      pushLot(exec.id, exec.executedAt, exec.side, exec.qty, priceCents, toCents(exec.fees));
+      pushLot(exec.id, exec.executedAt, exec.side, exec.qty, priceUnits, toUnits(exec.fees));
       continue;
     }
 
     // Reducing side: consume from the head of the queue, possibly closing
     // several lots (each its own trade) with this one execution.
     let remaining = exec.qty;
-    const feeCentsPerShare = exec.qty === 0 ? 0 : toCents(exec.fees) / exec.qty;
+    const feeUnitsPerShare = exec.qty === 0 ? 0 : toUnits(exec.fees) / exec.qty;
 
     while (remaining > 0 && queue.length > 0) {
       const lot = queue[0];
       const consumeQty = Math.min(lot.remainingQty, remaining);
 
       lot.exitQty += consumeQty;
-      lot.exitSumCents += consumeQty * priceCents;
-      lot.feesCents += feeCentsPerShare * consumeQty;
+      lot.exitSumUnits += consumeQty * priceUnits;
+      lot.feesUnits += feeUnitsPerShare * consumeQty;
       lot.links.push({ executionId: exec.id, role: "exit", qtyApplied: consumeQty, price: exec.price });
       lot.remainingQty -= consumeQty;
       remaining -= consumeQty;
@@ -158,7 +164,7 @@ export function matchFifoTrades(executions: FifoExecutionInput[]): FifoTrade[] {
     if (remaining > 0) {
       // Queue fully drained but this execution still has qty left over --
       // it flips the position and opens a new lot in the other direction.
-      pushLot(exec.id, exec.executedAt, exec.side, remaining, priceCents, feeCentsPerShare * remaining);
+      pushLot(exec.id, exec.executedAt, exec.side, remaining, priceUnits, feeUnitsPerShare * remaining);
     }
   }
 
