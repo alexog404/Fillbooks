@@ -139,19 +139,21 @@ export function TradeChart({ bars, executions, entry, exit, pnl, qty, status }: 
     // Default to a window padded around the trade itself, not the whole
     // session -- fitContent() on a full 390-bar day made short trades a
     // sliver a few pixels wide, with markers overlapping and unreadable.
-    const barTimes = displayBars.map((b) => b.time.getTime());
-    const dataStart = barTimes[0];
-    const dataEnd = barTimes[barTimes.length - 1];
-    const windowStart = entryTime ? entryTime.getTime() : dataStart;
-    const windowEnd = exitTime ? exitTime.getTime() : entryTime ? entryTime.getTime() : dataEnd;
-    const durationMin = Math.max(1, (windowEnd - windowStart) / 60_000);
-    const padMs = Math.min(60, Math.max(8, Math.round(durationMin * 0.7))) * 60_000;
-    const from = Math.max(dataStart, windowStart - padMs);
-    const to = Math.min(dataEnd, windowEnd + padMs);
-    if (from < to) {
-      chart.timeScale().setVisibleRange({ from: toUtcTimestamp(new Date(from)), to: toUtcTimestamp(new Date(to)) });
-    } else {
-      chart.timeScale().fitContent();
+    function applyDefaultWindow() {
+      const barTimes = displayBars.map((b) => b.time.getTime());
+      const dataStart = barTimes[0];
+      const dataEnd = barTimes[barTimes.length - 1];
+      const windowStart = entryTime ? entryTime.getTime() : dataStart;
+      const windowEnd = exitTime ? exitTime.getTime() : entryTime ? entryTime.getTime() : dataEnd;
+      const durationMin = Math.max(1, (windowEnd - windowStart) / 60_000);
+      const padMs = Math.min(60, Math.max(8, Math.round(durationMin * 0.7))) * 60_000;
+      const from = Math.max(dataStart, windowStart - padMs);
+      const to = Math.min(dataEnd, windowEnd + padMs);
+      if (from < to) {
+        chart.timeScale().setVisibleRange({ from: toUtcTimestamp(new Date(from)), to: toUtcTimestamp(new Date(to)) });
+      } else {
+        chart.timeScale().fitContent();
+      }
     }
 
     function renderBox() {
@@ -175,7 +177,14 @@ export function TradeChart({ bars, executions, entry, exit, pnl, qty, status }: 
       });
     }
 
-    renderBox();
+    // `autoSize` fits the chart to `container` via ResizeObserver, which
+    // fires *after* this synchronous setup runs -- calling setVisibleRange
+    // or reading coordinates before that first resize lands silently no-ops
+    // against a zero-width chart. Deferring a frame lets that resize settle.
+    const raf = requestAnimationFrame(() => {
+      applyDefaultWindow();
+      renderBox();
+    });
     chart.timeScale().subscribeVisibleLogicalRangeChange(renderBox);
     const resizeObserver = new ResizeObserver(renderBox);
     resizeObserver.observe(container);
@@ -191,6 +200,7 @@ export function TradeChart({ bars, executions, entry, exit, pnl, qty, status }: 
     chart.subscribeCrosshairMove(handleCrosshairMove);
 
     return () => {
+      cancelAnimationFrame(raf);
       resizeObserver.disconnect();
       chart.timeScale().unsubscribeVisibleLogicalRangeChange(renderBox);
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
