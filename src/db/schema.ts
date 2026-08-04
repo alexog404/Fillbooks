@@ -92,9 +92,10 @@ export const executions = pgTable(
   "executions",
   {
     id: id(),
-    // sha256(date|time|symbol|side|qty|price) -- see import/dedupe.ts. Ref #
-    // is deliberately excluded: it's not unique across a partial fill's
-    // sibling executions (see CLAUDE.md).
+    // sha256(date|time|symbol|side|qty|price|sourceRef) -- see
+    // trades/dedupe.ts. sourceRef is a per-fill id (Schwab's activityId),
+    // not a shared order ref -- needed because two distinct fills can land
+    // at the same second, qty, and price (see CLAUDE.md's trap #4).
     dedupeHash: text("dedupe_hash").notNull(),
     date: text("date").notNull(),
     time: text("time").notNull(),

@@ -52,6 +52,7 @@ export function mapSchwabTransactions(transactions: SchwabTransaction[]): Mapped
   const results: MappedExecution[] = [];
   for (const tx of transactions) {
     if (tx.type !== "TRADE") continue;
+    let equityItemIndex = 0;
     for (const item of tx.transferItems) {
       if (item.instrument.assetType !== "EQUITY") continue;
       if (item.price == null || item.amount === 0) continue;
@@ -61,9 +62,11 @@ export function mapSchwabTransactions(transactions: SchwabTransaction[]): Mapped
       const qty = Math.abs(item.amount);
       const symbol = item.instrument.symbol;
       const price = item.price;
+      const sourceRef = `${tx.activityId}:${equityItemIndex}`;
+      equityItemIndex++;
 
       results.push({
-        dedupeHash: computeExecutionDedupeHash({ date, time, symbol, side, qty, price }),
+        dedupeHash: computeExecutionDedupeHash({ date, time, symbol, side, qty, price, sourceRef }),
         date,
         time,
         symbol,
