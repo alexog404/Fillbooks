@@ -30,9 +30,10 @@ export function ReportsClient({ trades }: { trades: Trade[] }) {
   const [pickerMonth, setPickerMonth] = useState(defaultStart.slice(0, 7));
   const [rangeStart, setRangeStart] = useState(defaultStart);
   const [rangeEnd, setRangeEnd] = useState(fridayOf(defaultStart));
+  const [isLifetime, setIsLifetime] = useState(true);
 
   const rangeLabel = fmtDay(rangeStart) + " – " + fmtDay(rangeEnd);
-  const reportsTrades = trades.filter((t) => t.date >= rangeStart && t.date <= rangeEnd);
+  const reportsTrades = isLifetime ? trades : trades.filter((t) => t.date >= rangeStart && t.date <= rangeEnd);
 
   if (trades.length === 0) {
     return (
@@ -56,25 +57,49 @@ export function ReportsClient({ trades }: { trades: Trade[] }) {
     <div className="px-7 pt-6 pb-10">
       <div className="flex items-center justify-between mb-4">
         <Header />
-        <div className="relative">
-          <button type="button" onClick={() => setShowPicker((v) => !v)} className="text-[15px] px-3 py-1.5 rounded-md bg-surface-2 border border-border text-text-secondary cursor-pointer flex items-center gap-1.5">
-            📅 {rangeLabel} ▾
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsLifetime(true)}
+            className="text-[15px] px-3 py-1.5 rounded-md border cursor-pointer font-semibold"
+            style={
+              isLifetime
+                ? { background: "var(--accent-soft)", borderColor: "var(--primary)", color: "var(--primary)" }
+                : { background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-secondary)" }
+            }
+          >
+            Lifetime
           </button>
-          {showPicker && (
-            <DateRangePicker
-              monthKey={pickerMonth}
-              onMonthChange={setPickerMonth}
-              rangeStart={rangeStart}
-              rangeEnd={rangeEnd}
-              trades={trades}
-              align="right"
-              onRangeConfirm={(start, end) => {
-                setRangeStart(start);
-                setRangeEnd(end);
-                setShowPicker(false);
-              }}
-            />
-          )}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowPicker((v) => !v)}
+              className="text-[15px] px-3 py-1.5 rounded-md border cursor-pointer flex items-center gap-1.5"
+              style={
+                isLifetime
+                  ? { background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-secondary)" }
+                  : { background: "var(--accent-soft)", borderColor: "var(--primary)", color: "var(--primary)" }
+              }
+            >
+              📅 {rangeLabel} ▾
+            </button>
+            {showPicker && (
+              <DateRangePicker
+                monthKey={pickerMonth}
+                onMonthChange={setPickerMonth}
+                rangeStart={rangeStart}
+                rangeEnd={rangeEnd}
+                trades={trades}
+                align="right"
+                onRangeConfirm={(start, end) => {
+                  setRangeStart(start);
+                  setRangeEnd(end);
+                  setIsLifetime(false);
+                  setShowPicker(false);
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
 
